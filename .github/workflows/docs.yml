@@ -1,11 +1,10 @@
-name: Deploy Docs
+name: Deploy docs
 on:
   push:
     branches: [main]
 
 jobs:
-  release:
-    name: Docs
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

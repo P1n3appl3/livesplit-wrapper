@@ -1,9 +1,10 @@
 name: Continuous integration
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
 
 jobs:
-  check:
-    name: Build
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -19,7 +20,6 @@ jobs:
           args: --target wasm32-unknown-unknown
 
   test:
-    name: Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -32,8 +32,7 @@ jobs:
         with:
           command: test
 
-  fmt:
-    name: Format
+  format:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -48,7 +47,7 @@ jobs:
           command: fmt
           args: -- --check
 
-  clippy_check:
+  clippy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
