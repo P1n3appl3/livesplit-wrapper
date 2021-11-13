@@ -2,6 +2,11 @@
 name = "livesplit-wrapper"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+description = "A helper crate for writing autosplitters for LiveSplit One"
+repository = "https://github.com/p1n3appl3/livesplit-wrapper/"
+categories = ["api-bindings", "games", "wasm"]
+keywords = ["speedrun", "livesplit", "autosplitter"]
 
 [dependencies]
 bytemuck = "1.7.2"
