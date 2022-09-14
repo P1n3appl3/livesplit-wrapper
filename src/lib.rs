@@ -1,69 +1,32 @@
 #![deny(missing_docs)]
-/*!
-A safe wrapper of the [livesplit-core](https://github.com/LiveSplit/livesplit-core) api for creating autosplitters.
-
-LiveSplit One uses dynamically loaded WASM modules for plugins, which means they have to communicate over a C interface. This crate contains ergonomic wrappers to write those plugins in safe rust. At the moment only autosplitters are supported, but there will eventually be support for more general plugins.
-
-# Implementing an autosplitter
-
-To write an autosplitter you need to implement the [`Splitter`] trait and invoke the [`register_autosplitter!`] macro on your splitter.
-
-Here's a full working (albeit nonsensical) example. Build this with `--target wasm32-unknown-unknown` and it can be loaded by frontends such as [`livesplit-one-desktop`](https://github.com/CryZe/livesplit-one-desktop) or [`obs-livesplit-one`](https://github.com/CryZe/obs-livesplit-one):
-```
-use livesplit_wrapper::{Splitter, Process, TimerState, HostFunctions};
-
-#[derive(Default)]
-struct MySplitter {
-    process: Option<Process>,
-}
-
-livesplit_wrapper::register_autosplitter!(MySplitter);
-impl Splitter for MySplitter {
-    fn new() -> Self {
-        let mut s = MySplitter::default();
-        s.process = s.attach("CoolGame.exe");
-        if s.process.is_none() {
-            s.print("failed to connect to process, is the game running?");
-        }
-        s.set_tick_rate(120.0);
-        s.set_variable("items collected", "0");
-        s
-    }
-
-    fn update(&mut self) {
-        if let Some(p) = &self.process {
-            match (self.state(), p.read::<i16>(0xD1DAC71C)) {
-                (TimerState::Paused, Ok(314)) => self.unpause(),
-                (TimerState::Running, Ok(42)) => self.pause(),
-                _ => {}
-            }
-        }
-    }
-}
-```
-*/
-// TODO: add link once livesplit-core provides a local debug runtime
+#![doc = include_str!("../README.md")]
+#![doc(html_logo_url = "https://github.com/LiveSplit.png")]
 
 use std::mem::{self, MaybeUninit};
 use std::slice;
 
-use bytemuck::Pod;
+pub use bytemuck::Pod;
 
 /// Wires up the necessary c interface for a type that implements [`Splitter`].
 ///
 /// If you defined `struct MySplitter {...}` and `impl Splitter for MySplitter
-/// {...}` then just write `register_autosplitter!(MySplitter);` and you'll be
-/// good to go.
+/// {...}` then you can write `register_autosplitter!(MySplitter);` and you'll
+/// be good to go.
 #[macro_export]
 macro_rules! register_autosplitter {
     ($struct:ident) => {
-        use std::cell::RefCell;
-        thread_local! {static SINGLETON: RefCell<$struct> = RefCell::default()}
-        pub extern "C" fn configure() {
-            SINGLETON.with(|s| s.replace($struct::new()));
+        use std::cell::{Cell, RefCell};
+        thread_local! {
+            static SINGLETON: RefCell<$struct> = RefCell::default();
+            static INITIALIZED: Cell<bool> = Cell::new(false);
         }
+        #[no_mangle]
         pub extern "C" fn update() {
-            SINGLETON.with(|s| s.borrow_mut().update());
+            if INITIALIZED.with(|id| id.get()) {
+                SINGLETON.with(|s| s.borrow_mut().update());
+            } else {
+                SINGLETON.with(|s| s.replace($struct::new()));
+            }
         }
     };
 }
@@ -76,7 +39,9 @@ pub enum Error {
     FailedRead,
 }
 
-type Result<T> = std::result::Result<T, Error>;
+/// The result of an attempt to read process memory.
+pub type Result<T> = std::result::Result<T, Error>;
+
 /// An address in the attached processes memory.
 ///
 /// Autosplitters can attach to 32-bit processes, they'll just get an error if
@@ -108,7 +73,7 @@ impl Process {
     /// by name and return its base address.
     pub fn module(&self, name: &str) -> Option<Address> {
         unsafe {
-            match ffi::get_module(self.0, name.as_ptr() as u32, name.len() as u32) {
+            match ffi::process_get_module_address(self.0, name.as_ptr() as u32, name.len() as u32) {
                 0 => None,
                 n => Some(n),
             }
@@ -119,17 +84,38 @@ impl Process {
     /// into `buf`.
     pub fn read_into_buf(&self, addr: Address, buf: &mut [u8]) -> Result<()> {
         unsafe {
-            (ffi::read_mem(self.0, addr, buf.as_mut_ptr() as u32, buf.len() as u32) != 0)
-                .then(|| ())
+            (ffi::process_read(self.0, addr, buf.as_mut_ptr() as u32, buf.len() as u32) != 0)
+                .then_some(())
                 .ok_or(Error::FailedRead)
         }
+    }
+
+    /// Reads a null terminated string starting at the given base address.
+    /// Returns an `Error` if no null is encountered after 255 bytes or the
+    /// bytes read are invalid unicode.
+    pub fn read_cstr(&self, base: u64) -> Result<String> {
+        const MAX_STR_LEN: usize = 256;
+        let mut buf = vec![0u8; MAX_STR_LEN];
+        unsafe {
+            (ffi::process_read(
+                self.0,
+                base,
+                buf.as_mut_ptr() as u32,
+                MAX_STR_LEN as u32 - 1,
+            ) != 0)
+                .then_some(())
+                .ok_or(Error::FailedRead)?;
+        }
+        buf.truncate(buf.iter().position(|&x| x == 0).expect("string too long") + 1);
+        let cstr = std::ffi::CString::from_vec_with_nul(buf).expect("invalid unicode");
+        Ok(cstr.to_string_lossy().to_string())
     }
 }
 
 impl Drop for Process {
     fn drop(&mut self) {
         unsafe {
-            ffi::detach(self.0);
+            ffi::process_detach(self.0);
         }
     }
 }
@@ -172,13 +158,13 @@ pub trait HostFunctions {
     /// logging will not work (this could chagne in the future as LiveSplit
     /// plans to support WASI).
     fn print(&self, str: &str) {
-        unsafe { ffi::print_message(str.as_ptr(), str.len()) }
+        unsafe { ffi::runtime_print_message(str.as_ptr(), str.len()) }
     }
 
     /// Attach to a process running on the same machine as the autosplitter.
     fn attach(&self, name: &str) -> Option<Process> {
         unsafe {
-            match ffi::attach(name.as_ptr() as u32, name.len() as u32) {
+            match ffi::process_attach(name.as_ptr() as u32, name.len() as u32) {
                 0 => None,
                 n => Some(Process(n)),
             }
@@ -189,7 +175,7 @@ pub trait HostFunctions {
     /// subsequent calls. To start a new run, call `reset()` and _then_
     /// `start()`.
     fn start(&self) {
-        unsafe { ffi::start() }
+        unsafe { ffi::timer_start() }
     }
 
     /// Pause the game time counter. This is often used when entering a loading
@@ -198,17 +184,17 @@ pub trait HostFunctions {
     /// immediately after pausing so that LiveSplit's game time counter
     /// shows the exact current time.
     fn pause(&self) {
-        unsafe { ffi::pause_game_time() }
+        unsafe { ffi::timer_pause_game_time() }
     }
 
     /// Resume the game time counter. Note that
     fn unpause(&self) {
-        unsafe { ffi::resume_game_time() }
+        unsafe { ffi::timer_resume_game_time() }
     }
 
     /// Mark the current split as finished and move to the next one.
     fn split(&self) {
-        unsafe { ffi::split() }
+        unsafe { ffi::timer_split() }
     }
 
     /// Reset the run. Don't do this automatically when a run has finished, and
@@ -216,33 +202,33 @@ pub trait HostFunctions {
     /// autosplitter. Common practice is to do so only if there's an
     /// unambiguous signal that the player is done with this run.
     fn reset(&self) {
-        unsafe { ffi::reset() }
+        unsafe { ffi::timer_reset() }
     }
 
     /// Set the game time. Note that if the timer is not paused, the time shown
     /// will keep incrementing immediately after it is set to the given
     /// value.
     fn set_game_time(&self, time: f64) {
-        unsafe { ffi::set_game_time(time) }
+        unsafe { ffi::timer_set_game_time(time) }
     }
 
     /// Set the rate at which the [`update`](Splitter::update) function will be
     /// called (in Hz).
     fn set_tick_rate(&self, rate: f64) {
-        unsafe { ffi::set_tick_rate(rate) }
+        unsafe { ffi::runtime_set_tick_rate(rate) }
     }
 
     /// Get the current state of the timer. This is how the autosplitter can
     /// detect if the player manually paused or reset a run.
     fn state(&self) -> TimerState {
-        unsafe { std::mem::transmute(ffi::get_timer_state() as u8) }
+        unsafe { std::mem::transmute(ffi::timer_get_state() as u8) }
     }
 
     /// Set a variable which can be displayed by LiveSplit. This is commonly
     /// used for features like death counters.
     fn set_variable(&self, key: &str, value: &str) {
         unsafe {
-            ffi::set_variable(
+            ffi::timer_set_variable(
                 key.as_ptr() as u32,
                 key.len() as u32,
                 value.as_ptr() as u32,
@@ -265,24 +251,24 @@ pub enum TimerState {
     /// The timer is paused.
     Paused = 2,
     /// The timer is stopped because a run was completed.
-    Finished = 3,
+    Ended = 3,
 }
 
 mod ffi {
     extern "C" {
-        pub(crate) fn print_message(ptr: *const u8, len: usize);
-        pub(crate) fn attach(ptr: u32, len: u32) -> u64;
-        pub(crate) fn detach(handle: u64);
-        pub(crate) fn get_module(handle: u64, ptr: u32, len: u32) -> u64;
-        pub(crate) fn read_mem(handle: u64, address: u64, buf: u32, buf_len: u32) -> u32;
-        pub(crate) fn start();
-        pub(crate) fn split();
-        pub(crate) fn reset();
-        pub(crate) fn set_tick_rate(rate: f64);
-        pub(crate) fn set_variable(key: u32, key_len: u32, value: u32, value_len: u32);
-        pub(crate) fn pause_game_time();
-        pub(crate) fn resume_game_time();
-        pub(crate) fn set_game_time(time: f64);
-        pub(crate) fn get_timer_state() -> u32;
+        pub(crate) fn runtime_print_message(ptr: *const u8, len: usize);
+        pub(crate) fn runtime_set_tick_rate(rate: f64);
+        pub(crate) fn process_attach(ptr: u32, len: u32) -> u64;
+        pub(crate) fn process_detach(handle: u64);
+        pub(crate) fn process_get_module_address(handle: u64, ptr: u32, len: u32) -> u64;
+        pub(crate) fn process_read(handle: u64, address: u64, buf: u32, buf_len: u32) -> u32;
+        pub(crate) fn timer_start();
+        pub(crate) fn timer_split();
+        pub(crate) fn timer_reset();
+        pub(crate) fn timer_set_variable(key: u32, key_len: u32, value: u32, value_len: u32);
+        pub(crate) fn timer_set_game_time(time: f64);
+        pub(crate) fn timer_pause_game_time();
+        pub(crate) fn timer_resume_game_time();
+        pub(crate) fn timer_get_state() -> u32;
     }
 }

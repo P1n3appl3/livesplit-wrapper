@@ -9,4 +9,4 @@ categories = ["api-bindings", "games", "wasm"]
 keywords = ["speedrun", "livesplit", "autosplitter"]
 
 [dependencies]
-bytemuck = "1.7.2"
+bytemuck = "1.11"
