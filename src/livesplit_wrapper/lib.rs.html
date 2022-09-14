@@ -1,102 +1,104 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../livesplit_wrapper/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
-<span id="2">  2</span>
-<span id="3">  3</span>
-<span id="4">  4</span>
-<span id="5">  5</span>
-<span id="6">  6</span>
-<span id="7">  7</span>
-<span id="8">  8</span>
-<span id="9">  9</span>
-<span id="10"> 10</span>
-<span id="11"> 11</span>
-<span id="12"> 12</span>
-<span id="13"> 13</span>
-<span id="14"> 14</span>
-<span id="15"> 15</span>
-<span id="16"> 16</span>
-<span id="17"> 17</span>
-<span id="18"> 18</span>
-<span id="19"> 19</span>
-<span id="20"> 20</span>
-<span id="21"> 21</span>
-<span id="22"> 22</span>
-<span id="23"> 23</span>
-<span id="24"> 24</span>
-<span id="25"> 25</span>
-<span id="26"> 26</span>
-<span id="27"> 27</span>
-<span id="28"> 28</span>
-<span id="29"> 29</span>
-<span id="30"> 30</span>
-<span id="31"> 31</span>
-<span id="32"> 32</span>
-<span id="33"> 33</span>
-<span id="34"> 34</span>
-<span id="35"> 35</span>
-<span id="36"> 36</span>
-<span id="37"> 37</span>
-<span id="38"> 38</span>
-<span id="39"> 39</span>
-<span id="40"> 40</span>
-<span id="41"> 41</span>
-<span id="42"> 42</span>
-<span id="43"> 43</span>
-<span id="44"> 44</span>
-<span id="45"> 45</span>
-<span id="46"> 46</span>
-<span id="47"> 47</span>
-<span id="48"> 48</span>
-<span id="49"> 49</span>
-<span id="50"> 50</span>
-<span id="51"> 51</span>
-<span id="52"> 52</span>
-<span id="53"> 53</span>
-<span id="54"> 54</span>
-<span id="55"> 55</span>
-<span id="56"> 56</span>
-<span id="57"> 57</span>
-<span id="58"> 58</span>
-<span id="59"> 59</span>
-<span id="60"> 60</span>
-<span id="61"> 61</span>
-<span id="62"> 62</span>
-<span id="63"> 63</span>
-<span id="64"> 64</span>
-<span id="65"> 65</span>
-<span id="66"> 66</span>
-<span id="67"> 67</span>
-<span id="68"> 68</span>
-<span id="69"> 69</span>
-<span id="70"> 70</span>
-<span id="71"> 71</span>
-<span id="72"> 72</span>
-<span id="73"> 73</span>
-<span id="74"> 74</span>
-<span id="75"> 75</span>
-<span id="76"> 76</span>
-<span id="77"> 77</span>
-<span id="78"> 78</span>
-<span id="79"> 79</span>
-<span id="80"> 80</span>
-<span id="81"> 81</span>
-<span id="82"> 82</span>
-<span id="83"> 83</span>
-<span id="84"> 84</span>
-<span id="85"> 85</span>
-<span id="86"> 86</span>
-<span id="87"> 87</span>
-<span id="88"> 88</span>
-<span id="89"> 89</span>
-<span id="90"> 90</span>
-<span id="91"> 91</span>
-<span id="92"> 92</span>
-<span id="93"> 93</span>
-<span id="94"> 94</span>
-<span id="95"> 95</span>
-<span id="96"> 96</span>
-<span id="97"> 97</span>
-<span id="98"> 98</span>
-<span id="99"> 99</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../livesplit_wrapper/index.html"><div class="logo-container"><img src="https://github.com/LiveSplit.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../livesplit_wrapper/index.html"><div class="logo-container">
+                    <img src="https://github.com/LiveSplit.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../livesplit_wrapper/index.html">
+                        <img src="https://github.com/LiveSplit.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
@@ -272,309 +274,279 @@
 <span id="272">272</span>
 <span id="273">273</span>
 <span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
-<span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="doccomment">/*!
-A safe wrapper of the [livesplit-core](https://github.com/LiveSplit/livesplit-core) api for creating autosplitters.
+</pre><pre class="rust"><code><span class="attribute">#![deny(missing_docs)]
+#![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]
+#![doc(html_logo_url = <span class="string">&quot;https://github.com/LiveSplit.png&quot;</span>)]
 
-LiveSplit One uses dynamically loaded WASM modules for plugins, which means they have to communicate over a C interface. This crate contains ergonomic wrappers to write those plugins in safe rust. At the moment only autosplitters are supported, but there will eventually be support for more general plugins.
+</span><span class="kw">use </span>std::mem::{<span class="self">self</span>, MaybeUninit};
+<span class="kw">use </span>std::slice;
 
-# Implementing an autosplitter
+<span class="kw">pub use </span>bytemuck::Pod;
 
-To write an autosplitter you need to implement the [`Splitter`] trait and invoke the [`register_autosplitter!`] macro on your splitter.
-
-Here&#39;s a full working (albeit nonsensical) example. Build this with `--target wasm32-unknown-unknown` and it can be loaded by frontends such as [`livesplit-one-desktop`](https://github.com/CryZe/livesplit-one-desktop) or [`obs-livesplit-one`](https://github.com/CryZe/obs-livesplit-one):
-```
-use livesplit_wrapper::{Splitter, Process, TimerState, HostFunctions};
-
-#[derive(Default)]
-struct MySplitter {
-    process: Option&lt;Process&gt;,
-}
-
-livesplit_wrapper::register_autosplitter!(MySplitter);
-impl Splitter for MySplitter {
-    fn new() -&gt; Self {
-        let mut s = MySplitter::default();
-        s.process = s.attach(&quot;CoolGame.exe&quot;);
-        if s.process.is_none() {
-            s.print(&quot;failed to connect to process, is the game running?&quot;);
-        }
-        s.set_tick_rate(120.0);
-        s.set_variable(&quot;items collected&quot;, &quot;0&quot;);
-        s
-    }
-
-    fn update(&amp;mut self) {
-        if let Some(p) = &amp;self.process {
-            match (self.state(), p.read::&lt;i16&gt;(0xD1DAC71C)) {
-                (TimerState::Paused, Ok(314)) =&gt; self.unpause(),
-                (TimerState::Running, Ok(42)) =&gt; self.pause(),
-                _ =&gt; {}
-            }
-        }
-    }
-}
-```
-*/</span>
-<span class="comment">// TODO: add link once livesplit-core provides a local debug runtime</span>
-
-<span class="kw">use</span> <span class="ident">std::mem</span>::{<span class="self">self</span>, <span class="ident">MaybeUninit</span>};
-<span class="kw">use</span> <span class="ident">std::slice</span>;
-
-<span class="kw">use</span> <span class="ident">bytemuck::Pod</span>;
-
-<span class="doccomment">/// Wires up the necessary c interface for a type that implements [`Splitter`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If you defined `struct MySplitter {...}` and `impl Splitter for MySplitter</span>
-<span class="doccomment">/// {...}` then just write `register_autosplitter!(MySplitter);` and you&#39;ll be</span>
-<span class="doccomment">/// good to go.</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">register_autosplitter</span> {
+<span class="doccomment">/// Wires up the necessary c interface for a type that implements [`Splitter`].
+///
+/// If you defined `struct MySplitter {...}` and `impl Splitter for MySplitter
+/// {...}` then you can write `register_autosplitter!(MySplitter);` and you&#39;ll
+/// be good to go.
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>register_autosplitter {
     (<span class="macro-nonterminal">$</span><span class="kw">struct</span>:<span class="macro-nonterminal">ident</span>) =&gt; {
-        <span class="kw">use</span> <span class="ident">std::cell::RefCell</span>;
-        <span class="macro">thread_local!</span> {<span class="kw">static</span> <span class="ident">SINGLETON</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">struct</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro-nonterminal">RefCell::default</span>()}
-        <span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">configure</span>() {
-            <span class="ident">SINGLETON</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">replace</span>(<span class="macro-nonterminal">$</span><span class="kw">struct</span><span class="macro-nonterminal">::new</span>()));
+        <span class="kw">use </span>std::cell::{Cell, RefCell};
+        <span class="macro">thread_local! </span>{
+            <span class="kw">static </span>SINGLETON: RefCell&lt;<span class="macro-nonterminal">$</span><span class="kw">struct</span>&gt; = <span class="macro-nonterminal">RefCell::default</span>();
+            <span class="kw">static </span>INITIALIZED: Cell&lt;bool&gt; = Cell::new(<span class="bool-val">false</span>);
         }
-        <span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">update</span>() {
-            <span class="ident">SINGLETON</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">borrow_mut</span>().<span class="ident">update</span>());
+        <span class="attribute">#[no_mangle]
+        </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>update() {
+            <span class="kw">if </span>INITIALIZED.with(|id| id.get()) {
+                SINGLETON.with(|s| s.borrow_mut().update());
+            } <span class="kw">else </span>{
+                SINGLETON.with(|s| s.replace(<span class="macro-nonterminal">$</span><span class="kw">struct</span><span class="macro-nonterminal">::new</span>()));
+            }
         }
     };
 }
 
-<span class="doccomment">/// Currently the only possible error is a failed memory read on the attached</span>
-<span class="doccomment">/// process.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// A memory read on the attached process failed</span>
-    <span class="ident">FailedRead</span>,
+<span class="doccomment">/// Currently the only possible error is a failed memory read on the attached
+/// process.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>Error {
+    <span class="doccomment">/// A memory read on the attached process failed
+    </span>FailedRead,
 }
 
-<span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
-<span class="doccomment">/// An address in the attached processes memory.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Autosplitters can attach to 32-bit processes, they&#39;ll just get an error if</span>
-<span class="doccomment">/// they try to read outside it&#39;s address space.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Address</span> <span class="op">=</span> <span class="ident">u64</span>;
+<span class="doccomment">/// The result of an attempt to read process memory.
+</span><span class="kw">pub type </span><span class="prelude-ty">Result</span>&lt;T&gt; = std::result::Result&lt;T, Error&gt;;
 
-<span class="doccomment">/// A handle representing an attached process that can be used to read its</span>
-<span class="doccomment">/// memory.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Process</span>(<span class="ident">u64</span>);
+<span class="doccomment">/// An address in the attached processes memory.
+///
+/// Autosplitters can attach to 32-bit processes, they&#39;ll just get an error if
+/// they try to read outside it&#39;s address space.
+</span><span class="kw">pub type </span>Address = u64;
 
-<span class="kw">impl</span> <span class="ident">Process</span> {
-    <span class="doccomment">/// Reads a single value from the attached processes memory space. To be</span>
-    <span class="doccomment">/// able to use this with your own types, they need to implement [`Pod`]</span>
-    <span class="doccomment">/// (it&#39;s implemented for the numeric types and fixed size arrays by</span>
-    <span class="doccomment">/// default).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">Address</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
-            <span class="self">self</span>.<span class="ident">read_into_buf</span>(
-                <span class="ident">addr</span>,
-                <span class="ident">slice::from_raw_parts_mut</span>(<span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()),
+<span class="doccomment">/// A handle representing an attached process that can be used to read its
+/// memory.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Process(u64);
+
+<span class="kw">impl </span>Process {
+    <span class="doccomment">/// Reads a single value from the attached processes memory space. To be
+    /// able to use this with your own types, they need to implement [`Pod`]
+    /// (it&#39;s implemented for the numeric types and fixed size arrays by
+    /// default).
+    </span><span class="kw">pub fn </span>read&lt;T: Pod&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, addr: Address) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = MaybeUninit::uninit();
+            <span class="self">self</span>.read_into_buf(
+                addr,
+                slice::from_raw_parts_mut(buf.as_mut_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>u8, mem::size_of::&lt;T&gt;()),
             )<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">buf</span>.<span class="ident">assume_init</span>())
+            <span class="prelude-val">Ok</span>(buf.assume_init())
         }
     }
 
-    <span class="doccomment">/// Search for a module (aka dynamic library) loaded by the attached process</span>
-    <span class="doccomment">/// by name and return its base address.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">module</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Address</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">match</span> <span class="ident">ffi::get_module</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">name</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="ident">name</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>) {
-                <span class="number">0</span> =&gt; <span class="prelude-val">None</span>,
-                <span class="ident">n</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">n</span>),
+    <span class="doccomment">/// Search for a module (aka dynamic library) loaded by the attached process
+    /// by name and return its base address.
+    </span><span class="kw">pub fn </span>module(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Address&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">match </span>ffi::process_get_module_address(<span class="self">self</span>.<span class="number">0</span>, name.as_ptr() <span class="kw">as </span>u32, name.len() <span class="kw">as </span>u32) {
+                <span class="number">0 </span>=&gt; <span class="prelude-val">None</span>,
+                n =&gt; <span class="prelude-val">Some</span>(n),
             }
         }
     }
 
-    <span class="doccomment">/// Read bytes from the attached processes memory space starting at `addr`</span>
-    <span class="doccomment">/// into `buf`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_into_buf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">Address</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            (<span class="ident">ffi::read_mem</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">addr</span>, <span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="ident">buf</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>)
-                .<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> ())
-                .<span class="ident">ok_or</span>(<span class="ident">Error::FailedRead</span>)
+    <span class="doccomment">/// Read bytes from the attached processes memory space starting at `addr`
+    /// into `buf`.
+    </span><span class="kw">pub fn </span>read_into_buf(<span class="kw-2">&amp;</span><span class="self">self</span>, addr: Address, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">unsafe </span>{
+            (ffi::process_read(<span class="self">self</span>.<span class="number">0</span>, addr, buf.as_mut_ptr() <span class="kw">as </span>u32, buf.len() <span class="kw">as </span>u32) != <span class="number">0</span>)
+                .then_some(())
+                .ok_or(Error::FailedRead)
+        }
+    }
+
+    <span class="doccomment">/// Reads a null terminated string starting at the given base address.
+    /// Returns an `Error` if no null is encountered after 255 bytes or the
+    /// bytes read are invalid unicode.
+    </span><span class="kw">pub fn </span>read_cstr(<span class="kw-2">&amp;</span><span class="self">self</span>, base: u64) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+        <span class="kw">const </span>MAX_STR_LEN: usize = <span class="number">256</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = <span class="macro">vec!</span>[<span class="number">0u8</span>; MAX_STR_LEN];
+        <span class="kw">unsafe </span>{
+            (ffi::process_read(
+                <span class="self">self</span>.<span class="number">0</span>,
+                base,
+                buf.as_mut_ptr() <span class="kw">as </span>u32,
+                MAX_STR_LEN <span class="kw">as </span>u32 - <span class="number">1</span>,
+            ) != <span class="number">0</span>)
+                .then_some(())
+                .ok_or(Error::FailedRead)<span class="question-mark">?</span>;
+        }
+        buf.truncate(buf.iter().position(|<span class="kw-2">&amp;</span>x| x == <span class="number">0</span>).expect(<span class="string">&quot;string too long&quot;</span>) + <span class="number">1</span>);
+        <span class="kw">let </span>cstr = std::ffi::CString::from_vec_with_nul(buf).expect(<span class="string">&quot;invalid unicode&quot;</span>);
+        <span class="prelude-val">Ok</span>(cstr.to_string_lossy().to_string())
+    }
+}
+
+<span class="kw">impl </span>Drop <span class="kw">for </span>Process {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            ffi::process_detach(<span class="self">self</span>.<span class="number">0</span>);
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Process</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::detach</span>(<span class="self">self</span>.<span class="number">0</span>);
-        }
-    }
+<span class="doccomment">/// The main autosplitter trait.
+///
+/// This trait is the entry point for the autosplitter&#39;s functionality. The
+/// `new` and `update` functions are hooks that will be called by LiveSplit. To
+/// interact with LiveSplit&#39;s timer, use the functions defined in
+/// [`HostFunctions`].
+///
+/// [`HostFunctions`] is automatically implemented on `Splitter`s, so in your
+/// `update` function you can call methods like
+/// [`self.split()`](HostFunctions::split) and
+/// [`self.set_game_time()`](HostFunctions::set_game_time).
+///
+/// ## REMEMBER!
+///
+/// Make sure you use the [`register_autosplitter!`] macro on your splitter!
+/// Without it, your wasm library won&#39;t expose the proper functions and it&#39;ll
+/// fail to load.
+</span><span class="kw">pub trait </span>Splitter {
+    <span class="doccomment">/// Called when the LiveSplit runtime instantiates your splitter. It&#39;s a
+    /// good time to attach to a game process, set initial variables, or
+    /// change your tick rate. Note that this _won&#39;t_ be called every time
+    /// the run is reset.
+    </span><span class="kw">fn </span>new() -&gt; <span class="self">Self</span>;
+
+    <span class="doccomment">/// Called periodically by the LiveSplit runtime. To change the rate that
+    /// it&#39;s called, use [`set_tick_rate`](HostFunctions::set_tick_rate)
+    </span><span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
 }
 
-<span class="doccomment">/// The main autosplitter trait.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait is the entry point for the autosplitter&#39;s functionality. The</span>
-<span class="doccomment">/// `new` and `update` functions are hooks that will be called by LiveSplit. To</span>
-<span class="doccomment">/// interact with LiveSplit&#39;s timer, use the functions defined in</span>
-<span class="doccomment">/// [`HostFunctions`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`HostFunctions`] is automatically implemented on `Splitter`s, so in your</span>
-<span class="doccomment">/// `update` function you can call methods like</span>
-<span class="doccomment">/// [`self.split()`](HostFunctions::split) and</span>
-<span class="doccomment">/// [`self.set_game_time()`](HostFunctions::set_game_time).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## REMEMBER!</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Make sure you use the [`register_autosplitter!`] macro on your splitter!</span>
-<span class="doccomment">/// Without it, your wasm library won&#39;t expose the proper functions and it&#39;ll</span>
-<span class="doccomment">/// fail to load.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Splitter</span> {
-    <span class="doccomment">/// Called when the LiveSplit runtime instantiates your splitter. It&#39;s a</span>
-    <span class="doccomment">/// good time to attach to a game process, set initial variables, or</span>
-    <span class="doccomment">/// change your tick rate. Note that this _won&#39;t_ be called every time</span>
-    <span class="doccomment">/// the run is reset.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span>;
-
-    <span class="doccomment">/// Called periodically by the LiveSplit runtime. To change the rate that</span>
-    <span class="doccomment">/// it&#39;s called, use [`set_tick_rate`](HostFunctions::set_tick_rate)</span>
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
-}
-
-<span class="doccomment">/// The autosplitter&#39;s interface for interacting with the LiveSpilit timer.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">HostFunctions</span> {
-    <span class="doccomment">/// Output a message. This can be used for debugging and/or sending error</span>
-    <span class="doccomment">/// messages to the player through whichever LiveSplit frontend they&#39;re</span>
-    <span class="doccomment">/// using. Note that because autosplitters run in WASM, they don&#39;t have</span>
-    <span class="doccomment">/// access to STDOUT or files, so typical solutions like `println!` and</span>
-    <span class="doccomment">/// logging will not work (this could chagne in the future as LiveSplit</span>
-    <span class="doccomment">/// plans to support WASI).</span>
-    <span class="kw">fn</span> <span class="ident">print</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::print_message</span>(<span class="ident">str</span>.<span class="ident">as_ptr</span>(), <span class="ident">str</span>.<span class="ident">len</span>()) }
+<span class="doccomment">/// The autosplitter&#39;s interface for interacting with the LiveSpilit timer.
+</span><span class="kw">pub trait </span>HostFunctions {
+    <span class="doccomment">/// Output a message. This can be used for debugging and/or sending error
+    /// messages to the player through whichever LiveSplit frontend they&#39;re
+    /// using. Note that because autosplitters run in WASM, they don&#39;t have
+    /// access to STDOUT or files, so typical solutions like `println!` and
+    /// logging will not work (this could chagne in the future as LiveSplit
+    /// plans to support WASI).
+    </span><span class="kw">fn </span>print(<span class="kw-2">&amp;</span><span class="self">self</span>, str: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">unsafe </span>{ ffi::runtime_print_message(str.as_ptr(), str.len()) }
     }
 
-    <span class="doccomment">/// Attach to a process running on the same machine as the autosplitter.</span>
-    <span class="kw">fn</span> <span class="ident">attach</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Process</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">match</span> <span class="ident">ffi::attach</span>(<span class="ident">name</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="ident">name</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>) {
-                <span class="number">0</span> =&gt; <span class="prelude-val">None</span>,
-                <span class="ident">n</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Process</span>(<span class="ident">n</span>)),
+    <span class="doccomment">/// Attach to a process running on the same machine as the autosplitter.
+    </span><span class="kw">fn </span>attach(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Process&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">match </span>ffi::process_attach(name.as_ptr() <span class="kw">as </span>u32, name.len() <span class="kw">as </span>u32) {
+                <span class="number">0 </span>=&gt; <span class="prelude-val">None</span>,
+                n =&gt; <span class="prelude-val">Some</span>(Process(n)),
             }
         }
     }
 
-    <span class="doccomment">/// Start the timer for a run. Note that this will silently do nothing on</span>
-    <span class="doccomment">/// subsequent calls. To start a new run, call `reset()` and _then_</span>
-    <span class="doccomment">/// `start()`.</span>
-    <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::start</span>() }
+    <span class="doccomment">/// Start the timer for a run. Note that this will silently do nothing on
+    /// subsequent calls. To start a new run, call `reset()` and _then_
+    /// `start()`.
+    </span><span class="kw">fn </span>start(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::timer_start() }
     }
 
-    <span class="doccomment">/// Pause the game time counter. This is often used when entering a loading</span>
-    <span class="doccomment">/// screen or end level screen for games that use in game time rather</span>
-    <span class="doccomment">/// than real time. It may be a good idea to call `set_game_time()`</span>
-    <span class="doccomment">/// immediately after pausing so that LiveSplit&#39;s game time counter</span>
-    <span class="doccomment">/// shows the exact current time.</span>
-    <span class="kw">fn</span> <span class="ident">pause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::pause_game_time</span>() }
+    <span class="doccomment">/// Pause the game time counter. This is often used when entering a loading
+    /// screen or end level screen for games that use in game time rather
+    /// than real time. It may be a good idea to call `set_game_time()`
+    /// immediately after pausing so that LiveSplit&#39;s game time counter
+    /// shows the exact current time.
+    </span><span class="kw">fn </span>pause(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::timer_pause_game_time() }
     }
 
-    <span class="doccomment">/// Resume the game time counter. Note that</span>
-    <span class="kw">fn</span> <span class="ident">unpause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::resume_game_time</span>() }
+    <span class="doccomment">/// Resume the game time counter. Note that
+    </span><span class="kw">fn </span>unpause(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::timer_resume_game_time() }
     }
 
-    <span class="doccomment">/// Mark the current split as finished and move to the next one.</span>
-    <span class="kw">fn</span> <span class="ident">split</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::split</span>() }
+    <span class="doccomment">/// Mark the current split as finished and move to the next one.
+    </span><span class="kw">fn </span>split(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::timer_split() }
     }
 
-    <span class="doccomment">/// Reset the run. Don&#39;t do this automatically when a run has finished, and</span>
-    <span class="doccomment">/// in general be conservative about resetting runs from the</span>
-    <span class="doccomment">/// autosplitter. Common practice is to do so only if there&#39;s an</span>
-    <span class="doccomment">/// unambiguous signal that the player is done with this run.</span>
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::reset</span>() }
+    <span class="doccomment">/// Reset the run. Don&#39;t do this automatically when a run has finished, and
+    /// in general be conservative about resetting runs from the
+    /// autosplitter. Common practice is to do so only if there&#39;s an
+    /// unambiguous signal that the player is done with this run.
+    </span><span class="kw">fn </span>reset(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::timer_reset() }
     }
 
-    <span class="doccomment">/// Set the game time. Note that if the timer is not paused, the time shown</span>
-    <span class="doccomment">/// will keep incrementing immediately after it is set to the given</span>
-    <span class="doccomment">/// value.</span>
-    <span class="kw">fn</span> <span class="ident">set_game_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">time</span>: <span class="ident">f64</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::set_game_time</span>(<span class="ident">time</span>) }
+    <span class="doccomment">/// Set the game time. Note that if the timer is not paused, the time shown
+    /// will keep incrementing immediately after it is set to the given
+    /// value.
+    </span><span class="kw">fn </span>set_game_time(<span class="kw-2">&amp;</span><span class="self">self</span>, time: f64) {
+        <span class="kw">unsafe </span>{ ffi::timer_set_game_time(time) }
     }
 
-    <span class="doccomment">/// Set the rate at which the [`update`](Splitter::update) function will be</span>
-    <span class="doccomment">/// called (in Hz).</span>
-    <span class="kw">fn</span> <span class="ident">set_tick_rate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rate</span>: <span class="ident">f64</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::set_tick_rate</span>(<span class="ident">rate</span>) }
+    <span class="doccomment">/// Set the rate at which the [`update`](Splitter::update) function will be
+    /// called (in Hz).
+    </span><span class="kw">fn </span>set_tick_rate(<span class="kw-2">&amp;</span><span class="self">self</span>, rate: f64) {
+        <span class="kw">unsafe </span>{ ffi::runtime_set_tick_rate(rate) }
     }
 
-    <span class="doccomment">/// Get the current state of the timer. This is how the autosplitter can</span>
-    <span class="doccomment">/// detect if the player manually paused or reset a run.</span>
-    <span class="kw">fn</span> <span class="ident">state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TimerState</span> {
-        <span class="kw">unsafe</span> { <span class="ident">std::mem::transmute</span>(<span class="ident">ffi::get_timer_state</span>() <span class="kw">as</span> <span class="ident">u8</span>) }
+    <span class="doccomment">/// Get the current state of the timer. This is how the autosplitter can
+    /// detect if the player manually paused or reset a run.
+    </span><span class="kw">fn </span>state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TimerState {
+        <span class="kw">unsafe </span>{ std::mem::transmute(ffi::timer_get_state() <span class="kw">as </span>u8) }
     }
 
-    <span class="doccomment">/// Set a variable which can be displayed by LiveSplit. This is commonly</span>
-    <span class="doccomment">/// used for features like death counters.</span>
-    <span class="kw">fn</span> <span class="ident">set_variable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">ffi::set_variable</span>(
-                <span class="ident">key</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">u32</span>,
-                <span class="ident">key</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>,
-                <span class="ident">value</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">u32</span>,
-                <span class="ident">value</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>,
+    <span class="doccomment">/// Set a variable which can be displayed by LiveSplit. This is commonly
+    /// used for features like death counters.
+    </span><span class="kw">fn </span>set_variable(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str, value: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">unsafe </span>{
+            ffi::timer_set_variable(
+                key.as_ptr() <span class="kw">as </span>u32,
+                key.len() <span class="kw">as </span>u32,
+                value.as_ptr() <span class="kw">as </span>u32,
+                value.len() <span class="kw">as </span>u32,
             );
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Splitter</span><span class="op">&gt;</span> <span class="ident">HostFunctions</span> <span class="kw">for</span> <span class="ident">T</span> {}
+<span class="kw">impl</span>&lt;T: Splitter&gt; HostFunctions <span class="kw">for </span>T {}
 
-<span class="doccomment">/// The possible states of the timer.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TimerState</span> {
-    <span class="doccomment">/// The timer has yet to be started.</span>
-    <span class="ident">NotRunning</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// The timer is currently running.</span>
-    <span class="ident">Running</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// The timer is paused.</span>
-    <span class="ident">Paused</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="doccomment">/// The timer is stopped because a run was completed.</span>
-    <span class="ident">Finished</span> <span class="op">=</span> <span class="number">3</span>,
+<span class="doccomment">/// The possible states of the timer.
+</span><span class="attribute">#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>TimerState {
+    <span class="doccomment">/// The timer has yet to be started.
+    </span>NotRunning = <span class="number">0</span>,
+    <span class="doccomment">/// The timer is currently running.
+    </span>Running = <span class="number">1</span>,
+    <span class="doccomment">/// The timer is paused.
+    </span>Paused = <span class="number">2</span>,
+    <span class="doccomment">/// The timer is stopped because a run was completed.
+    </span>Ended = <span class="number">3</span>,
 }
 
-<span class="kw">mod</span> <span class="ident">ffi</span> {
-    <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">print_message</span>(<span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>);
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">attach</span>(<span class="ident">ptr</span>: <span class="ident">u32</span>, <span class="ident">len</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u64</span>;
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">detach</span>(<span class="ident">handle</span>: <span class="ident">u64</span>);
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_module</span>(<span class="ident">handle</span>: <span class="ident">u64</span>, <span class="ident">ptr</span>: <span class="ident">u32</span>, <span class="ident">len</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u64</span>;
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_mem</span>(<span class="ident">handle</span>: <span class="ident">u64</span>, <span class="ident">address</span>: <span class="ident">u64</span>, <span class="ident">buf</span>: <span class="ident">u32</span>, <span class="ident">buf_len</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span>;
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">start</span>();
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">split</span>();
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">reset</span>();
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_tick_rate</span>(<span class="ident">rate</span>: <span class="ident">f64</span>);
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_variable</span>(<span class="ident">key</span>: <span class="ident">u32</span>, <span class="ident">key_len</span>: <span class="ident">u32</span>, <span class="ident">value</span>: <span class="ident">u32</span>, <span class="ident">value_len</span>: <span class="ident">u32</span>);
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pause_game_time</span>();
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">resume_game_time</span>();
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_game_time</span>(<span class="ident">time</span>: <span class="ident">f64</span>);
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_timer_state</span>() -&gt; <span class="ident">u32</span>;
+<span class="kw">mod </span>ffi {
+    <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>runtime_print_message(ptr: <span class="kw-2">*const </span>u8, len: usize);
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>runtime_set_tick_rate(rate: f64);
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>process_attach(ptr: u32, len: u32) -&gt; u64;
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>process_detach(handle: u64);
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>process_get_module_address(handle: u64, ptr: u32, len: u32) -&gt; u64;
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>process_read(handle: u64, address: u64, buf: u32, buf_len: u32) -&gt; u32;
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>timer_start();
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>timer_split();
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>timer_reset();
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>timer_set_variable(key: u32, key_len: u32, value: u32, value_len: u32);
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>timer_set_game_time(time: f64);
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>timer_pause_game_time();
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>timer_resume_game_time();
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>timer_get_state() -&gt; u32;
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="livesplit_wrapper" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="livesplit_wrapper" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (17cbdfd07 2022-09-13)" ></div></body></html>

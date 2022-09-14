@@ -1,102 +1,102 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bytemuck-1.7.2&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../bytemuck/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
-<span id="2">  2</span>
-<span id="3">  3</span>
-<span id="4">  4</span>
-<span id="5">  5</span>
-<span id="6">  6</span>
-<span id="7">  7</span>
-<span id="8">  8</span>
-<span id="9">  9</span>
-<span id="10"> 10</span>
-<span id="11"> 11</span>
-<span id="12"> 12</span>
-<span id="13"> 13</span>
-<span id="14"> 14</span>
-<span id="15"> 15</span>
-<span id="16"> 16</span>
-<span id="17"> 17</span>
-<span id="18"> 18</span>
-<span id="19"> 19</span>
-<span id="20"> 20</span>
-<span id="21"> 21</span>
-<span id="22"> 22</span>
-<span id="23"> 23</span>
-<span id="24"> 24</span>
-<span id="25"> 25</span>
-<span id="26"> 26</span>
-<span id="27"> 27</span>
-<span id="28"> 28</span>
-<span id="29"> 29</span>
-<span id="30"> 30</span>
-<span id="31"> 31</span>
-<span id="32"> 32</span>
-<span id="33"> 33</span>
-<span id="34"> 34</span>
-<span id="35"> 35</span>
-<span id="36"> 36</span>
-<span id="37"> 37</span>
-<span id="38"> 38</span>
-<span id="39"> 39</span>
-<span id="40"> 40</span>
-<span id="41"> 41</span>
-<span id="42"> 42</span>
-<span id="43"> 43</span>
-<span id="44"> 44</span>
-<span id="45"> 45</span>
-<span id="46"> 46</span>
-<span id="47"> 47</span>
-<span id="48"> 48</span>
-<span id="49"> 49</span>
-<span id="50"> 50</span>
-<span id="51"> 51</span>
-<span id="52"> 52</span>
-<span id="53"> 53</span>
-<span id="54"> 54</span>
-<span id="55"> 55</span>
-<span id="56"> 56</span>
-<span id="57"> 57</span>
-<span id="58"> 58</span>
-<span id="59"> 59</span>
-<span id="60"> 60</span>
-<span id="61"> 61</span>
-<span id="62"> 62</span>
-<span id="63"> 63</span>
-<span id="64"> 64</span>
-<span id="65"> 65</span>
-<span id="66"> 66</span>
-<span id="67"> 67</span>
-<span id="68"> 68</span>
-<span id="69"> 69</span>
-<span id="70"> 70</span>
-<span id="71"> 71</span>
-<span id="72"> 72</span>
-<span id="73"> 73</span>
-<span id="74"> 74</span>
-<span id="75"> 75</span>
-<span id="76"> 76</span>
-<span id="77"> 77</span>
-<span id="78"> 78</span>
-<span id="79"> 79</span>
-<span id="80"> 80</span>
-<span id="81"> 81</span>
-<span id="82"> 82</span>
-<span id="83"> 83</span>
-<span id="84"> 84</span>
-<span id="85"> 85</span>
-<span id="86"> 86</span>
-<span id="87"> 87</span>
-<span id="88"> 88</span>
-<span id="89"> 89</span>
-<span id="90"> 90</span>
-<span id="91"> 91</span>
-<span id="92"> 92</span>
-<span id="93"> 93</span>
-<span id="94"> 94</span>
-<span id="95"> 95</span>
-<span id="96"> 96</span>
-<span id="97"> 97</span>
-<span id="98"> 98</span>
-<span id="99"> 99</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bytemuck-1.12.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bytemuck/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bytemuck/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bytemuck/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
@@ -383,556 +383,390 @@
 <span id="383">383</span>
 <span id="384">384</span>
 <span id="385">385</span>
-<span id="386">386</span>
-<span id="387">387</span>
-<span id="388">388</span>
-<span id="389">389</span>
-<span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
-<span id="393">393</span>
-<span id="394">394</span>
-<span id="395">395</span>
-<span id="396">396</span>
-<span id="397">397</span>
-<span id="398">398</span>
-<span id="399">399</span>
-<span id="400">400</span>
-<span id="401">401</span>
-<span id="402">402</span>
-<span id="403">403</span>
-<span id="404">404</span>
-<span id="405">405</span>
-<span id="406">406</span>
-<span id="407">407</span>
-<span id="408">408</span>
-<span id="409">409</span>
-<span id="410">410</span>
-<span id="411">411</span>
-<span id="412">412</span>
-<span id="413">413</span>
-<span id="414">414</span>
-<span id="415">415</span>
-<span id="416">416</span>
-<span id="417">417</span>
-<span id="418">418</span>
-<span id="419">419</span>
-<span id="420">420</span>
-<span id="421">421</span>
-<span id="422">422</span>
-<span id="423">423</span>
-<span id="424">424</span>
-<span id="425">425</span>
-<span id="426">426</span>
-<span id="427">427</span>
-<span id="428">428</span>
-<span id="429">429</span>
-<span id="430">430</span>
-<span id="431">431</span>
-<span id="432">432</span>
-<span id="433">433</span>
-<span id="434">434</span>
-<span id="435">435</span>
-<span id="436">436</span>
-<span id="437">437</span>
-<span id="438">438</span>
-<span id="439">439</span>
-<span id="440">440</span>
-<span id="441">441</span>
-<span id="442">442</span>
-<span id="443">443</span>
-<span id="444">444</span>
-<span id="445">445</span>
-<span id="446">446</span>
-<span id="447">447</span>
-<span id="448">448</span>
-<span id="449">449</span>
-<span id="450">450</span>
-<span id="451">451</span>
-<span id="452">452</span>
-<span id="453">453</span>
-<span id="454">454</span>
-<span id="455">455</span>
-<span id="456">456</span>
-<span id="457">457</span>
-<span id="458">458</span>
-<span id="459">459</span>
-<span id="460">460</span>
-<span id="461">461</span>
-<span id="462">462</span>
-<span id="463">463</span>
-<span id="464">464</span>
-<span id="465">465</span>
-<span id="466">466</span>
-<span id="467">467</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">no_std</span>]</span>
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![no_std]
+#![warn(missing_docs)]
+#![cfg_attr(feature = <span class="string">&quot;nightly_portable_simd&quot;</span>, feature(portable_simd))]
 
-<span class="doccomment">//! This crate gives small utilities for casting between plain data types.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Basics</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Data comes in five basic forms in Rust, so we have five basic casting</span>
-<span class="doccomment">//! functions:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * `T` uses [`cast`]</span>
-<span class="doccomment">//! * `&amp;T` uses [`cast_ref`]</span>
-<span class="doccomment">//! * `&amp;mut T` uses [`cast_mut`]</span>
-<span class="doccomment">//! * `&amp;[T]` uses [`cast_slice`]</span>
-<span class="doccomment">//! * `&amp;mut [T]` uses [`cast_slice_mut`]</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Some casts will never fail (eg: `cast::&lt;u32, f32&gt;` always works), other</span>
-<span class="doccomment">//! casts might fail (eg: `cast_ref::&lt;[u8; 4], u32&gt;` will fail if the reference</span>
-<span class="doccomment">//! isn&#39;t already aligned to 4). Each casting function has a &quot;try&quot; version which</span>
-<span class="doccomment">//! will return a `Result`, and the &quot;normal&quot; version which will simply panic on</span>
-<span class="doccomment">//! invalid input.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Using Your Own Types</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! All the functions here are guarded by the [`Pod`] trait, which is a</span>
-<span class="doccomment">//! sub-trait of the [`Zeroable`] trait.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If you&#39;re very sure that your type is eligible, you can implement those</span>
-<span class="doccomment">//! traits for your type and then they&#39;ll have full casting support. However,</span>
-<span class="doccomment">//! these traits are `unsafe`, and you should carefully read the requirements</span>
-<span class="doccomment">//! before adding the them to your own types.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Features</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * This crate is core only by default, but if you&#39;re using Rust 1.36 or later</span>
-<span class="doccomment">//!   you can enable the `extern_crate_alloc` cargo feature for some additional</span>
-<span class="doccomment">//!   methods related to `Box` and `Vec`. Note that the `docs.rs` documentation</span>
-<span class="doccomment">//!   is always built with `extern_crate_alloc` cargo feature enabled.</span>
+</span><span class="doccomment">//! This crate gives small utilities for casting between plain data types.
+//!
+//! ## Basics
+//!
+//! Data comes in five basic forms in Rust, so we have five basic casting
+//! functions:
+//!
+//! * `T` uses [`cast`]
+//! * `&amp;T` uses [`cast_ref`]
+//! * `&amp;mut T` uses [`cast_mut`]
+//! * `&amp;[T]` uses [`cast_slice`]
+//! * `&amp;mut [T]` uses [`cast_slice_mut`]
+//!
+//! Some casts will never fail (eg: `cast::&lt;u32, f32&gt;` always works), other
+//! casts might fail (eg: `cast_ref::&lt;[u8; 4], u32&gt;` will fail if the reference
+//! isn&#39;t already aligned to 4). Each casting function has a &quot;try&quot; version which
+//! will return a `Result`, and the &quot;normal&quot; version which will simply panic on
+//! invalid input.
+//!
+//! ## Using Your Own Types
+//!
+//! All the functions here are guarded by the [`Pod`] trait, which is a
+//! sub-trait of the [`Zeroable`] trait.
+//!
+//! If you&#39;re very sure that your type is eligible, you can implement those
+//! traits for your type and then they&#39;ll have full casting support. However,
+//! these traits are `unsafe`, and you should carefully read the requirements
+//! before adding the them to your own types.
+//!
+//! ## Features
+//!
+//! * This crate is core only by default, but if you&#39;re using Rust 1.36 or later
+//!   you can enable the `extern_crate_alloc` cargo feature for some additional
+//!   methods related to `Box` and `Vec`. Note that the `docs.rs` documentation
+//!   is always built with `extern_crate_alloc` cargo feature enabled.
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">core::arch::x86</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">core::arch::x86_64</span>;
-<span class="comment">//</span>
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">marker</span>::<span class="kw-2">*</span>, <span class="ident">mem</span>::<span class="kw-2">*</span>, <span class="ident">num</span>::<span class="kw-2">*</span>, <span class="ident">ptr</span>::<span class="kw-2">*</span>};
+</span><span class="attribute">#[cfg(all(target_arch = <span class="string">&quot;aarch64&quot;</span>, feature = <span class="string">&quot;aarch64_simd&quot;</span>))]
+</span><span class="kw">use </span>core::arch::aarch64;
+<span class="attribute">#[cfg(all(target_arch = <span class="string">&quot;wasm32&quot;</span>, feature = <span class="string">&quot;wasm_simd&quot;</span>))]
+</span><span class="kw">use </span>core::arch::wasm32;
+<span class="attribute">#[cfg(target_arch = <span class="string">&quot;x86&quot;</span>)]
+</span><span class="kw">use </span>core::arch::x86;
+<span class="attribute">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+</span><span class="kw">use </span>core::arch::x86_64;
+<span class="comment">//
+</span><span class="kw">use </span>core::{marker::<span class="kw-2">*</span>, mem::<span class="kw-2">*</span>, num::<span class="kw-2">*</span>, ptr::<span class="kw-2">*</span>};
 
-<span class="comment">// Used from macros to ensure we aren&#39;t using some locally defined name and</span>
-<span class="comment">// actually are referencing libcore. This also would allow pre-2018 edition</span>
-<span class="comment">// crates to use our macros, but I&#39;m not sure how important that is.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">::core</span> <span class="kw">as</span> <span class="ident">__core</span>;
+<span class="comment">// Used from macros to ensure we aren&#39;t using some locally defined name and
+// actually are referencing libcore. This also would allow pre-2018 edition
+// crates to use our macros, but I&#39;m not sure how important that is.
+</span><span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub use </span>::core <span class="kw">as </span>__core;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;min_const_generics&quot;</span>))]</span>
-<span class="macro">macro_rules!</span> <span class="ident">impl_unsafe_marker_for_array</span> {
-  ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">marker</span>:<span class="ident">ident</span> , $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">expr</span> ),<span class="op">*</span> ) =&gt; {
-    $(<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">marker</span> <span class="kw">for</span> [<span class="ident">T</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>] <span class="kw">where</span> <span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">marker</span> {})<span class="op">*</span>
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;min_const_generics&quot;</span>))]
+</span><span class="macro">macro_rules! </span>impl_unsafe_marker_for_array {
+  ( <span class="macro-nonterminal">$marker</span>:ident , $( <span class="macro-nonterminal">$n</span>:expr ),* ) =&gt; {
+    $(<span class="kw">unsafe impl</span>&lt;T&gt; <span class="macro-nonterminal">$marker </span><span class="kw">for </span>[T; <span class="macro-nonterminal">$n</span>] <span class="kw">where </span>T: <span class="macro-nonterminal">$marker </span>{})*
   }
 }
 
-<span class="doccomment">/// A macro to transmute between two types without requiring knowing size statically.</span>
-<span class="macro">macro_rules!</span> <span class="ident">transmute</span> {
-  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>) =&gt; {
-    <span class="ident">transmute_copy</span>(<span class="kw-2">&amp;</span><span class="ident">ManuallyDrop::new</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>))
+<span class="doccomment">/// A macro to transmute between two types without requiring knowing size
+/// statically.
+</span><span class="macro">macro_rules! </span>transmute {
+  (<span class="macro-nonterminal">$val</span>:expr) =&gt; {
+    ::core::mem::transmute_copy(<span class="kw-2">&amp;</span>::core::mem::ManuallyDrop::new(<span class="macro-nonterminal">$val</span>))
   };
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extern_crate_std&quot;</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">std</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;extern_crate_std&quot;</span>)]
+</span><span class="kw">extern crate </span>std;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extern_crate_alloc&quot;</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extern_crate_alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">allocation</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extern_crate_alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">allocation</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;extern_crate_alloc&quot;</span>)]
+</span><span class="kw">extern crate </span>alloc;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;extern_crate_alloc&quot;</span>)]
+</span><span class="kw">pub mod </span>allocation;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;extern_crate_alloc&quot;</span>)]
+</span><span class="kw">pub use </span>allocation::<span class="kw-2">*</span>;
 
-<span class="kw">mod</span> <span class="ident">zeroable</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">zeroable</span>::<span class="kw-2">*</span>;
+<span class="kw">mod </span>anybitpattern;
+<span class="kw">pub use </span>anybitpattern::<span class="kw-2">*</span>;
 
-<span class="kw">mod</span> <span class="ident">pod</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pod</span>::<span class="kw-2">*</span>;
+<span class="kw">pub mod </span>checked;
+<span class="kw">pub use </span>checked::CheckedBitPattern;
 
-<span class="kw">mod</span> <span class="ident">contiguous</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">contiguous</span>::<span class="kw-2">*</span>;
+<span class="kw">mod </span>internal;
 
-<span class="kw">mod</span> <span class="ident">offset_of</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">offset_of</span>::<span class="kw-2">*</span>;
+<span class="kw">mod </span>zeroable;
+<span class="kw">pub use </span>zeroable::<span class="kw-2">*</span>;
+<span class="kw">mod </span>zeroable_in_option;
+<span class="kw">pub use </span>zeroable_in_option::<span class="kw-2">*</span>;
 
-<span class="kw">mod</span> <span class="ident">transparent</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">transparent</span>::<span class="kw-2">*</span>;
+<span class="kw">mod </span>pod;
+<span class="kw">pub use </span>pod::<span class="kw-2">*</span>;
+<span class="kw">mod </span>pod_in_option;
+<span class="kw">pub use </span>pod_in_option::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;derive&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">bytemuck_derive</span>::{<span class="ident">Contiguous</span>, <span class="ident">Pod</span>, <span class="ident">TransparentWrapper</span>, <span class="ident">Zeroable</span>};
+<span class="kw">mod </span>no_uninit;
+<span class="kw">pub use </span>no_uninit::<span class="kw-2">*</span>;
 
-<span class="comment">/*
+<span class="kw">mod </span>contiguous;
+<span class="kw">pub use </span>contiguous::<span class="kw-2">*</span>;
 
-Note(Lokathor): We&#39;ve switched all of the `unwrap` to `match` because there is
-apparently a bug: https://github.com/rust-lang/rust/issues/68667
-and it doesn&#39;t seem to show up in simple godbolt examples but has been reported
-as having an impact when there&#39;s a cast mixed in with other more complicated
-code around it. Rustc/LLVM ends up missing that the `Err` can&#39;t ever happen for
-particular type combinations, and then it doesn&#39;t fully eliminated the panic
-possibility code branch.
+<span class="kw">mod </span>offset_of;
+<span class="kw">pub use </span>offset_of::<span class="kw-2">*</span>;
 
-*/</span>
+<span class="kw">mod </span>transparent;
+<span class="kw">pub use </span>transparent::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// Immediately panics.</span>
-<span class="attribute">#[<span class="ident">cold</span>]</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">never</span>)]</span>
-<span class="kw">fn</span> <span class="ident">something_went_wrong</span>(<span class="ident">_src</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_err</span>: <span class="ident">PodCastError</span>) -&gt; <span class="op">!</span> {
-  <span class="comment">// Note(Lokathor): Keeping the panic here makes the panic _formatting_ go</span>
-  <span class="comment">// here too, which helps assembly readability and also helps keep down</span>
-  <span class="comment">// the inline pressure.</span>
-  <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;spirv&quot;</span>))]</span>
-  <span class="macro">panic!</span>(<span class="string">&quot;{src}&gt;{err:?}&quot;</span>, <span class="ident">src</span> <span class="op">=</span> <span class="ident">_src</span>, <span class="ident">err</span> <span class="op">=</span> <span class="ident">_err</span>);
-  <span class="comment">// Note: On the spirv targets from [rust-gpu](https://github.com/EmbarkStudios/rust-gpu)</span>
-  <span class="comment">// panic formatting cannot be used. We we just give a generic error message</span>
-  <span class="comment">// The chance that the panicing version of these functions will ever get called</span>
-  <span class="comment">// on spir-v targets with invalid inputs is small, but giving a simple error</span>
-  <span class="comment">// message is better than no error message at all.</span>
-  <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;spirv&quot;</span>)]</span>
-  <span class="macro">panic!</span>(<span class="string">&quot;Called a panicing helper from bytemuck which paniced&quot;</span>);
+<span class="attribute">#[cfg(feature = <span class="string">&quot;derive&quot;</span>)]
+</span><span class="kw">pub use </span>bytemuck_derive::{
+  AnyBitPattern, CheckedBitPattern, Contiguous, NoUninit, Pod,
+  TransparentWrapper, Zeroable,
+};
+
+<span class="doccomment">/// The things that can go wrong when casting between [`Pod`] data forms.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub enum </span>PodCastError {
+  <span class="doccomment">/// You tried to cast a slice to an element type with a higher alignment
+  /// requirement but the slice wasn&#39;t aligned.
+  </span>TargetAlignmentGreaterAndInputNotAligned,
+  <span class="doccomment">/// If the element size changes then the output slice changes length
+  /// accordingly. If the output slice wouldn&#39;t be a whole number of elements
+  /// then the conversion fails.
+  </span>OutputSliceWouldHaveSlop,
+  <span class="doccomment">/// When casting a slice you can&#39;t convert between ZST elements and non-ZST
+  /// elements. When casting an individual `T`, `&amp;T`, or `&amp;mut T` value the
+  /// source size and destination size must be an exact match.
+  </span>SizeMismatch,
+  <span class="doccomment">/// For this type of cast the alignments must be exactly the same and they
+  /// were not so now you&#39;re sad.
+  ///
+  /// This error is generated **only** by operations that cast allocated types
+  /// (such as `Box` and `Vec`), because in that case the alignment must stay
+  /// exact.
+  </span>AlignmentMismatch,
 }
-
-<span class="doccomment">/// Re-interprets `&amp;T` as `&amp;[u8]`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Any ZST becomes an empty slice, and in that case the pointer value of that</span>
-<span class="doccomment">/// empty slice might not match the pointer value of the input reference.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bytes_of</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-  <span class="kw">if</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="number">0</span> {
-    <span class="kw-2">&amp;</span>[]
-  } <span class="kw">else</span> {
-    <span class="kw">match</span> <span class="ident">try_cast_slice</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">u8</span><span class="op">&gt;</span>(<span class="ident">core::slice::from_ref</span>(<span class="ident">t</span>)) {
-      <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
-      <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
-    }
+<span class="attribute">#[cfg(not(target_arch = <span class="string">&quot;spirv&quot;</span>))]
+</span><span class="kw">impl </span>core::fmt::Display <span class="kw">for </span>PodCastError {
+  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; core::fmt::Result {
+    <span class="macro">write!</span>(f, <span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>)
   }
 }
+<span class="attribute">#[cfg(feature = <span class="string">&quot;extern_crate_std&quot;</span>)]
+</span><span class="kw">impl </span>std::error::Error <span class="kw">for </span>PodCastError {}
 
-<span class="doccomment">/// Re-interprets `&amp;mut T` as `&amp;mut [u8]`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Any ZST becomes an empty slice, and in that case the pointer value of that</span>
-<span class="doccomment">/// empty slice might not match the pointer value of the input reference.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bytes_of_mut</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(<span class="ident">t</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>] {
-  <span class="kw">if</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="number">0</span> {
-    <span class="kw-2">&amp;mut</span> []
-  } <span class="kw">else</span> {
-    <span class="kw">match</span> <span class="ident">try_cast_slice_mut</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">u8</span><span class="op">&gt;</span>(<span class="ident">core::slice::from_mut</span>(<span class="ident">t</span>)) {
-      <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
-      <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
-    }
-  }
+<span class="doccomment">/// Re-interprets `&amp;T` as `&amp;[u8]`.
+///
+/// Any ZST becomes an empty slice, and in that case the pointer value of that
+/// empty slice might not match the pointer value of the input reference.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>bytes_of&lt;T: NoUninit&gt;(t: <span class="kw-2">&amp;</span>T) -&gt; <span class="kw-2">&amp;</span>[u8] {
+  <span class="kw">unsafe </span>{ internal::bytes_of(t) }
 }
 
-<span class="doccomment">/// Re-interprets `&amp;[u8]` as `&amp;T`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Panics</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is [`try_from_bytes`] but will panic on error.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-  <span class="kw">match</span> <span class="ident">try_from_bytes</span>(<span class="ident">s</span>) {
-    <span class="prelude-val">Ok</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
-    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">something_went_wrong</span>(<span class="string">&quot;from_bytes&quot;</span>, <span class="ident">e</span>),
-  }
+<span class="doccomment">/// Re-interprets `&amp;mut T` as `&amp;mut [u8]`.
+///
+/// Any ZST becomes an empty slice, and in that case the pointer value of that
+/// empty slice might not match the pointer value of the input reference.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>bytes_of_mut&lt;T: NoUninit + AnyBitPattern&gt;(t: <span class="kw-2">&amp;mut </span>T) -&gt; <span class="kw-2">&amp;mut </span>[u8] {
+  <span class="kw">unsafe </span>{ internal::bytes_of_mut(t) }
 }
 
-<span class="doccomment">/// Re-interprets `&amp;mut [u8]` as `&amp;mut T`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Panics</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is [`try_from_bytes_mut`] but will panic on error.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes_mut</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-  <span class="kw">match</span> <span class="ident">try_from_bytes_mut</span>(<span class="ident">s</span>) {
-    <span class="prelude-val">Ok</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
-    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">something_went_wrong</span>(<span class="string">&quot;from_bytes_mut&quot;</span>, <span class="ident">e</span>),
-  }
+<span class="doccomment">/// Re-interprets `&amp;[u8]` as `&amp;T`.
+///
+/// ## Panics
+///
+/// This is [`try_from_bytes`] but will panic on error.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>from_bytes&lt;T: AnyBitPattern&gt;(s: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="kw-2">&amp;</span>T {
+  <span class="kw">unsafe </span>{ internal::from_bytes(s) }
 }
 
-<span class="doccomment">/// Re-interprets `&amp;[u8]` as `&amp;T`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Failure</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * If the slice isn&#39;t aligned for the new type</span>
-<span class="doccomment">/// * If the slice&#39;s length isn’t exactly the size of the new type</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from_bytes</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">PodCastError</span><span class="op">&gt;</span> {
-  <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() {
-    <span class="prelude-val">Err</span>(<span class="ident">PodCastError::SizeMismatch</span>)
-  } <span class="kw">else</span> <span class="kw">if</span> (<span class="ident">s</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">%</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-    <span class="prelude-val">Err</span>(<span class="ident">PodCastError::TargetAlignmentGreaterAndInputNotAligned</span>)
-  } <span class="kw">else</span> {
-    <span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">s</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">T</span>) })
-  }
+<span class="doccomment">/// Re-interprets `&amp;mut [u8]` as `&amp;mut T`.
+///
+/// ## Panics
+///
+/// This is [`try_from_bytes_mut`] but will panic on error.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>from_bytes_mut&lt;T: NoUninit + AnyBitPattern&gt;(s: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="kw-2">&amp;mut </span>T {
+  <span class="kw">unsafe </span>{ internal::from_bytes_mut(s) }
 }
 
-<span class="doccomment">/// Re-interprets `&amp;mut [u8]` as `&amp;mut T`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Failure</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * If the slice isn&#39;t aligned for the new type</span>
-<span class="doccomment">/// * If the slice&#39;s length isn’t exactly the size of the new type</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from_bytes_mut</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(
-  <span class="ident">s</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">PodCastError</span><span class="op">&gt;</span> {
-  <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() {
-    <span class="prelude-val">Err</span>(<span class="ident">PodCastError::SizeMismatch</span>)
-  } <span class="kw">else</span> <span class="kw">if</span> (<span class="ident">s</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">%</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-    <span class="prelude-val">Err</span>(<span class="ident">PodCastError::TargetAlignmentGreaterAndInputNotAligned</span>)
-  } <span class="kw">else</span> {
-    <span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">s</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">T</span>) })
-  }
+<span class="doccomment">/// Reads from the bytes as if they were a `T`.
+///
+/// ## Failure
+/// * If the `bytes` length is not equal to `size_of::&lt;T&gt;()`.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>try_pod_read_unaligned&lt;T: AnyBitPattern&gt;(
+  bytes: <span class="kw-2">&amp;</span>[u8],
+) -&gt; <span class="prelude-ty">Result</span>&lt;T, PodCastError&gt; {
+  <span class="kw">unsafe </span>{ internal::try_pod_read_unaligned(bytes) }
 }
 
-<span class="doccomment">/// The things that can go wrong when casting between [`Pod`] data forms.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PodCastError</span> {
-  <span class="doccomment">/// You tried to cast a slice to an element type with a higher alignment</span>
-  <span class="doccomment">/// requirement but the slice wasn&#39;t aligned.</span>
-  <span class="ident">TargetAlignmentGreaterAndInputNotAligned</span>,
-  <span class="doccomment">/// If the element size changes then the output slice changes length</span>
-  <span class="doccomment">/// accordingly. If the output slice wouldn&#39;t be a whole number of elements</span>
-  <span class="doccomment">/// then the conversion fails.</span>
-  <span class="ident">OutputSliceWouldHaveSlop</span>,
-  <span class="doccomment">/// When casting a slice you can&#39;t convert between ZST elements and non-ZST</span>
-  <span class="doccomment">/// elements. When casting an individual `T`, `&amp;T`, or `&amp;mut T` value the</span>
-  <span class="doccomment">/// source size and destination size must be an exact match.</span>
-  <span class="ident">SizeMismatch</span>,
-  <span class="doccomment">/// For this type of cast the alignments must be exactly the same and they</span>
-  <span class="doccomment">/// were not so now you&#39;re sad.</span>
-  <span class="doccomment">///</span>
-  <span class="doccomment">/// This error is generated **only** by operations that cast allocated types</span>
-  <span class="doccomment">/// (such as `Box` and `Vec`), because in that case the alignment must stay</span>
-  <span class="doccomment">/// exact.</span>
-  <span class="ident">AlignmentMismatch</span>,
-}
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;spirv&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">core::fmt::Display</span> <span class="kw">for</span> <span class="ident">PodCastError</span> {
-  <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>)
-  }
-}
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;extern_crate_std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">PodCastError</span> {}
-
-<span class="doccomment">/// Cast `T` into `U`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Panics</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * This is like [`try_cast`](try_cast), but will panic on a size mismatch.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cast</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Pod</span>, <span class="ident">B</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="ident">A</span>) -&gt; <span class="ident">B</span> {
-  <span class="kw">if</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() {
-    <span class="kw">unsafe</span> { <span class="macro">transmute!</span>(<span class="ident">a</span>) }
-  } <span class="kw">else</span> {
-    <span class="ident">something_went_wrong</span>(<span class="string">&quot;cast&quot;</span>, <span class="ident">PodCastError::SizeMismatch</span>)
-  }
+<span class="doccomment">/// Reads the slice into a `T` value.
+///
+/// ## Panics
+/// * This is like `try_pod_read_unaligned` but will panic on failure.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>pod_read_unaligned&lt;T: AnyBitPattern&gt;(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; T {
+  <span class="kw">unsafe </span>{ internal::pod_read_unaligned(bytes) }
 }
 
-<span class="doccomment">/// Cast `&amp;mut T` into `&amp;mut U`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Panics</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is [`try_cast_mut`] but will panic on error.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cast_mut</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Pod</span>, <span class="ident">B</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="ident">A</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">B</span> {
-  <span class="kw">if</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">&amp;&amp;</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() {
-    <span class="comment">// Plz mr compiler, just notice that we can&#39;t ever hit Err in this case.</span>
-    <span class="kw">match</span> <span class="ident">try_cast_mut</span>(<span class="ident">a</span>) {
-      <span class="prelude-val">Ok</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>,
-      <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
-    }
-  } <span class="kw">else</span> {
-    <span class="kw">match</span> <span class="ident">try_cast_mut</span>(<span class="ident">a</span>) {
-      <span class="prelude-val">Ok</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>,
-      <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">something_went_wrong</span>(<span class="string">&quot;cast_mut&quot;</span>, <span class="ident">e</span>),
-    }
-  }
+<span class="doccomment">/// Re-interprets `&amp;[u8]` as `&amp;T`.
+///
+/// ## Failure
+///
+/// * If the slice isn&#39;t aligned for the new type
+/// * If the slice&#39;s length isn’t exactly the size of the new type
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>try_from_bytes&lt;T: AnyBitPattern&gt;(s: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>T, PodCastError&gt; {
+  <span class="kw">unsafe </span>{ internal::try_from_bytes(s) }
 }
 
-<span class="doccomment">/// Cast `&amp;T` into `&amp;U`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Panics</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is [`try_cast_ref`] but will panic on error.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cast_ref</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Pod</span>, <span class="ident">B</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">B</span> {
-  <span class="kw">if</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">&amp;&amp;</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() {
-    <span class="comment">// Plz mr compiler, just notice that we can&#39;t ever hit Err in this case.</span>
-    <span class="kw">match</span> <span class="ident">try_cast_ref</span>(<span class="ident">a</span>) {
-      <span class="prelude-val">Ok</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>,
-      <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
-    }
-  } <span class="kw">else</span> {
-    <span class="kw">match</span> <span class="ident">try_cast_ref</span>(<span class="ident">a</span>) {
-      <span class="prelude-val">Ok</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>,
-      <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">something_went_wrong</span>(<span class="string">&quot;cast_ref&quot;</span>, <span class="ident">e</span>),
-    }
-  }
+<span class="doccomment">/// Re-interprets `&amp;mut [u8]` as `&amp;mut T`.
+///
+/// ## Failure
+///
+/// * If the slice isn&#39;t aligned for the new type
+/// * If the slice&#39;s length isn’t exactly the size of the new type
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>try_from_bytes_mut&lt;T: NoUninit + AnyBitPattern&gt;(
+  s: <span class="kw-2">&amp;mut </span>[u8],
+) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;mut </span>T, PodCastError&gt; {
+  <span class="kw">unsafe </span>{ internal::try_from_bytes_mut(s) }
 }
 
-<span class="doccomment">/// Cast `&amp;[A]` into `&amp;[B]`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Panics</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is [`try_cast_slice`] but will panic on error.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cast_slice</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Pod</span>, <span class="ident">B</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">A</span>]) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">B</span>] {
-  <span class="kw">match</span> <span class="ident">try_cast_slice</span>(<span class="ident">a</span>) {
-    <span class="prelude-val">Ok</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>,
-    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">something_went_wrong</span>(<span class="string">&quot;cast_slice&quot;</span>, <span class="ident">e</span>),
-  }
+<span class="doccomment">/// Cast `T` into `U`
+///
+/// ## Panics
+///
+/// * This is like [`try_cast`](try_cast), but will panic on a size mismatch.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>cast&lt;A: NoUninit, B: AnyBitPattern&gt;(a: A) -&gt; B {
+  <span class="kw">unsafe </span>{ internal::cast(a) }
 }
 
-<span class="doccomment">/// Cast `&amp;mut [T]` into `&amp;mut [U]`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Panics</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is [`try_cast_slice_mut`] but will panic on error.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cast_slice_mut</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Pod</span>, <span class="ident">B</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">A</span>]) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">B</span>] {
-  <span class="kw">match</span> <span class="ident">try_cast_slice_mut</span>(<span class="ident">a</span>) {
-    <span class="prelude-val">Ok</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>,
-    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">something_went_wrong</span>(<span class="string">&quot;cast_slice_mut&quot;</span>, <span class="ident">e</span>),
-  }
+<span class="doccomment">/// Cast `&amp;mut T` into `&amp;mut U`.
+///
+/// ## Panics
+///
+/// This is [`try_cast_mut`] but will panic on error.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>cast_mut&lt;A: NoUninit + AnyBitPattern, B: NoUninit + AnyBitPattern&gt;(
+  a: <span class="kw-2">&amp;mut </span>A,
+) -&gt; <span class="kw-2">&amp;mut </span>B {
+  <span class="kw">unsafe </span>{ internal::cast_mut(a) }
 }
 
-<span class="doccomment">/// As `align_to`, but safe because of the [`Pod`] bound.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pod_align_to</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Pod</span>, <span class="ident">U</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(<span class="ident">vals</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) -&gt; (<span class="kw-2">&amp;</span>[<span class="ident">T</span>], <span class="kw-2">&amp;</span>[<span class="ident">U</span>], <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) {
-  <span class="kw">unsafe</span> { <span class="ident">vals</span>.<span class="ident">align_to</span>::<span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>() }
+<span class="doccomment">/// Cast `&amp;T` into `&amp;U`.
+///
+/// ## Panics
+///
+/// This is [`try_cast_ref`] but will panic on error.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>cast_ref&lt;A: NoUninit, B: AnyBitPattern&gt;(a: <span class="kw-2">&amp;</span>A) -&gt; <span class="kw-2">&amp;</span>B {
+  <span class="kw">unsafe </span>{ internal::cast_ref(a) }
 }
 
-<span class="doccomment">/// As `align_to_mut`, but safe because of the [`Pod`] bound.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pod_align_to_mut</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Pod</span>, <span class="ident">U</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(
-  <span class="ident">vals</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">T</span>],
-) -&gt; (<span class="kw-2">&amp;mut</span> [<span class="ident">T</span>], <span class="kw-2">&amp;mut</span> [<span class="ident">U</span>], <span class="kw-2">&amp;mut</span> [<span class="ident">T</span>]) {
-  <span class="kw">unsafe</span> { <span class="ident">vals</span>.<span class="ident">align_to_mut</span>::<span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>() }
+<span class="doccomment">/// Cast `&amp;[A]` into `&amp;[B]`.
+///
+/// ## Panics
+///
+/// This is [`try_cast_slice`] but will panic on error.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>cast_slice&lt;A: NoUninit, B: AnyBitPattern&gt;(a: <span class="kw-2">&amp;</span>[A]) -&gt; <span class="kw-2">&amp;</span>[B] {
+  <span class="kw">unsafe </span>{ internal::cast_slice(a) }
 }
 
-<span class="doccomment">/// Try to cast `T` into `U`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that for this particular type of cast, alignment isn&#39;t a factor. The</span>
-<span class="doccomment">/// input value is semantically copied into the function and then returned to a</span>
-<span class="doccomment">/// new memory location which will have whatever the required alignment of the</span>
-<span class="doccomment">/// output type is.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Failure</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * If the types don&#39;t have the same size this fails.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_cast</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Pod</span>, <span class="ident">B</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">PodCastError</span><span class="op">&gt;</span> {
-  <span class="kw">if</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() {
-    <span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> { <span class="macro">transmute!</span>(<span class="ident">a</span>) })
-  } <span class="kw">else</span> {
-    <span class="prelude-val">Err</span>(<span class="ident">PodCastError::SizeMismatch</span>)
-  }
+<span class="doccomment">/// Cast `&amp;mut [T]` into `&amp;mut [U]`.
+///
+/// ## Panics
+///
+/// This is [`try_cast_slice_mut`] but will panic on error.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>cast_slice_mut&lt;
+  A: NoUninit + AnyBitPattern,
+  B: NoUninit + AnyBitPattern,
+&gt;(
+  a: <span class="kw-2">&amp;mut </span>[A],
+) -&gt; <span class="kw-2">&amp;mut </span>[B] {
+  <span class="kw">unsafe </span>{ internal::cast_slice_mut(a) }
 }
 
-<span class="doccomment">/// Try to convert a `&amp;T` into `&amp;U`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Failure</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * If the reference isn&#39;t aligned in the new type</span>
-<span class="doccomment">/// * If the source type and target type aren&#39;t the same size.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_cast_ref</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Pod</span>, <span class="ident">B</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">B</span>, <span class="ident">PodCastError</span><span class="op">&gt;</span> {
-  <span class="comment">// Note(Lokathor): everything with `align_of` and `size_of` will optimize away</span>
-  <span class="comment">// after monomorphization.</span>
-  <span class="kw">if</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">&gt;</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>()
-    <span class="op">&amp;&amp;</span> (<span class="ident">a</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">A</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">%</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-  {
-    <span class="prelude-val">Err</span>(<span class="ident">PodCastError::TargetAlignmentGreaterAndInputNotAligned</span>)
-  } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() {
-    <span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">a</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">A</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">B</span>) })
-  } <span class="kw">else</span> {
-    <span class="prelude-val">Err</span>(<span class="ident">PodCastError::SizeMismatch</span>)
-  }
+<span class="doccomment">/// As `align_to`, but safe because of the [`Pod`] bound.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>pod_align_to&lt;T: NoUninit, U: AnyBitPattern&gt;(
+  vals: <span class="kw-2">&amp;</span>[T],
+) -&gt; (<span class="kw-2">&amp;</span>[T], <span class="kw-2">&amp;</span>[U], <span class="kw-2">&amp;</span>[T]) {
+  <span class="kw">unsafe </span>{ vals.align_to::&lt;U&gt;() }
 }
 
-<span class="doccomment">/// Try to convert a `&amp;mut T` into `&amp;mut U`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// As [`try_cast_ref`], but `mut`.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_cast_mut</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Pod</span>, <span class="ident">B</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="ident">A</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">B</span>, <span class="ident">PodCastError</span><span class="op">&gt;</span> {
-  <span class="comment">// Note(Lokathor): everything with `align_of` and `size_of` will optimize away</span>
-  <span class="comment">// after monomorphization.</span>
-  <span class="kw">if</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">&gt;</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>()
-    <span class="op">&amp;&amp;</span> (<span class="ident">a</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">A</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">%</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-  {
-    <span class="prelude-val">Err</span>(<span class="ident">PodCastError::TargetAlignmentGreaterAndInputNotAligned</span>)
-  } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() {
-    <span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">a</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">A</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">B</span>) })
-  } <span class="kw">else</span> {
-    <span class="prelude-val">Err</span>(<span class="ident">PodCastError::SizeMismatch</span>)
-  }
+<span class="doccomment">/// As `align_to_mut`, but safe because of the [`Pod`] bound.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>pod_align_to_mut&lt;
+  T: NoUninit + AnyBitPattern,
+  U: NoUninit + AnyBitPattern,
+&gt;(
+  vals: <span class="kw-2">&amp;mut </span>[T],
+) -&gt; (<span class="kw-2">&amp;mut </span>[T], <span class="kw-2">&amp;mut </span>[U], <span class="kw-2">&amp;mut </span>[T]) {
+  <span class="kw">unsafe </span>{ vals.align_to_mut::&lt;U&gt;() }
 }
 
-<span class="doccomment">/// Try to convert `&amp;[A]` into `&amp;[B]` (possibly with a change in length).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `input.as_ptr() as usize == output.as_ptr() as usize`</span>
-<span class="doccomment">/// * `input.len() * size_of::&lt;A&gt;() == output.len() * size_of::&lt;B&gt;()`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Failure</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * If the target type has a greater alignment requirement and the input slice</span>
-<span class="doccomment">///   isn&#39;t aligned.</span>
-<span class="doccomment">/// * If the target element type is a different size from the current element</span>
-<span class="doccomment">///   type, and the output slice wouldn&#39;t be a whole number of elements when</span>
-<span class="doccomment">///   accounting for the size change (eg: 3 `u16` values is 1.5 `u32` values, so</span>
-<span class="doccomment">///   that&#39;s a failure).</span>
-<span class="doccomment">/// * Similarly, you can&#39;t convert between a [ZST](https://doc.rust-lang.org/nomicon/exotic-sizes.html#zero-sized-types-zsts)</span>
-<span class="doccomment">///   and a non-ZST.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_cast_slice</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Pod</span>, <span class="ident">B</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">A</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">B</span>], <span class="ident">PodCastError</span><span class="op">&gt;</span> {
-  <span class="comment">// Note(Lokathor): everything with `align_of` and `size_of` will optimize away</span>
-  <span class="comment">// after monomorphization.</span>
-  <span class="kw">if</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">&gt;</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>()
-    <span class="op">&amp;&amp;</span> (<span class="ident">a</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">%</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-  {
-    <span class="prelude-val">Err</span>(<span class="ident">PodCastError::TargetAlignmentGreaterAndInputNotAligned</span>)
-  } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() {
-    <span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> { <span class="ident">core::slice::from_raw_parts</span>(<span class="ident">a</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">B</span>, <span class="ident">a</span>.<span class="ident">len</span>()) })
-  } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="number">0</span> {
-    <span class="prelude-val">Err</span>(<span class="ident">PodCastError::SizeMismatch</span>)
-  } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">core::mem::size_of_val</span>(<span class="ident">a</span>) <span class="op">%</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="number">0</span> {
-    <span class="kw">let</span> <span class="ident">new_len</span> <span class="op">=</span> <span class="ident">core::mem::size_of_val</span>(<span class="ident">a</span>) <span class="op">/</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>();
-    <span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> { <span class="ident">core::slice::from_raw_parts</span>(<span class="ident">a</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">B</span>, <span class="ident">new_len</span>) })
-  } <span class="kw">else</span> {
-    <span class="prelude-val">Err</span>(<span class="ident">PodCastError::OutputSliceWouldHaveSlop</span>)
-  }
+<span class="doccomment">/// Try to cast `T` into `U`.
+///
+/// Note that for this particular type of cast, alignment isn&#39;t a factor. The
+/// input value is semantically copied into the function and then returned to a
+/// new memory location which will have whatever the required alignment of the
+/// output type is.
+///
+/// ## Failure
+///
+/// * If the types don&#39;t have the same size this fails.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>try_cast&lt;A: NoUninit, B: AnyBitPattern&gt;(
+  a: A,
+) -&gt; <span class="prelude-ty">Result</span>&lt;B, PodCastError&gt; {
+  <span class="kw">unsafe </span>{ internal::try_cast(a) }
 }
 
-<span class="doccomment">/// Try to convert `&amp;mut [A]` into `&amp;mut [B]` (possibly with a change in</span>
-<span class="doccomment">/// length).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// As [`try_cast_slice`], but `&amp;mut`.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_cast_slice_mut</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Pod</span>, <span class="ident">B</span>: <span class="ident">Pod</span><span class="op">&gt;</span>(
-  <span class="ident">a</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">A</span>],
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> [<span class="ident">B</span>], <span class="ident">PodCastError</span><span class="op">&gt;</span> {
-  <span class="comment">// Note(Lokathor): everything with `align_of` and `size_of` will optimize away</span>
-  <span class="comment">// after monomorphization.</span>
-  <span class="kw">if</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">&gt;</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>()
-    <span class="op">&amp;&amp;</span> (<span class="ident">a</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">%</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-  {
-    <span class="prelude-val">Err</span>(<span class="ident">PodCastError::TargetAlignmentGreaterAndInputNotAligned</span>)
-  } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() {
-    <span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> {
-      <span class="ident">core::slice::from_raw_parts_mut</span>(<span class="ident">a</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">B</span>, <span class="ident">a</span>.<span class="ident">len</span>())
-    })
-  } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="number">0</span> {
-    <span class="prelude-val">Err</span>(<span class="ident">PodCastError::SizeMismatch</span>)
-  } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">core::mem::size_of_val</span>(<span class="ident">a</span>) <span class="op">%</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="number">0</span> {
-    <span class="kw">let</span> <span class="ident">new_len</span> <span class="op">=</span> <span class="ident">core::mem::size_of_val</span>(<span class="ident">a</span>) <span class="op">/</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>();
-    <span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> {
-      <span class="ident">core::slice::from_raw_parts_mut</span>(<span class="ident">a</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">B</span>, <span class="ident">new_len</span>)
-    })
-  } <span class="kw">else</span> {
-    <span class="prelude-val">Err</span>(<span class="ident">PodCastError::OutputSliceWouldHaveSlop</span>)
-  }
+<span class="doccomment">/// Try to convert a `&amp;T` into `&amp;U`.
+///
+/// ## Failure
+///
+/// * If the reference isn&#39;t aligned in the new type
+/// * If the source type and target type aren&#39;t the same size.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>try_cast_ref&lt;A: NoUninit, B: AnyBitPattern&gt;(
+  a: <span class="kw-2">&amp;</span>A,
+) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>B, PodCastError&gt; {
+  <span class="kw">unsafe </span>{ internal::try_cast_ref(a) }
+}
+
+<span class="doccomment">/// Try to convert a `&amp;mut T` into `&amp;mut U`.
+///
+/// As [`try_cast_ref`], but `mut`.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>try_cast_mut&lt;
+  A: NoUninit + AnyBitPattern,
+  B: NoUninit + AnyBitPattern,
+&gt;(
+  a: <span class="kw-2">&amp;mut </span>A,
+) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;mut </span>B, PodCastError&gt; {
+  <span class="kw">unsafe </span>{ internal::try_cast_mut(a) }
+}
+
+<span class="doccomment">/// Try to convert `&amp;[A]` into `&amp;[B]` (possibly with a change in length).
+///
+/// * `input.as_ptr() as usize == output.as_ptr() as usize`
+/// * `input.len() * size_of::&lt;A&gt;() == output.len() * size_of::&lt;B&gt;()`
+///
+/// ## Failure
+///
+/// * If the target type has a greater alignment requirement and the input slice
+///   isn&#39;t aligned.
+/// * If the target element type is a different size from the current element
+///   type, and the output slice wouldn&#39;t be a whole number of elements when
+///   accounting for the size change (eg: 3 `u16` values is 1.5 `u32` values, so
+///   that&#39;s a failure).
+/// * Similarly, you can&#39;t convert between a [ZST](https://doc.rust-lang.org/nomicon/exotic-sizes.html#zero-sized-types-zsts)
+///   and a non-ZST.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>try_cast_slice&lt;A: NoUninit, B: AnyBitPattern&gt;(
+  a: <span class="kw-2">&amp;</span>[A],
+) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>[B], PodCastError&gt; {
+  <span class="kw">unsafe </span>{ internal::try_cast_slice(a) }
+}
+
+<span class="doccomment">/// Try to convert `&amp;mut [A]` into `&amp;mut [B]` (possibly with a change in
+/// length).
+///
+/// As [`try_cast_slice`], but `&amp;mut`.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>try_cast_slice_mut&lt;
+  A: NoUninit + AnyBitPattern,
+  B: NoUninit + AnyBitPattern,
+&gt;(
+  a: <span class="kw-2">&amp;mut </span>[A],
+) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;mut </span>[B], PodCastError&gt; {
+  <span class="kw">unsafe </span>{ internal::try_cast_slice_mut(a) }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bytemuck" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bytemuck" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (17cbdfd07 2022-09-13)" ></div></body></html>

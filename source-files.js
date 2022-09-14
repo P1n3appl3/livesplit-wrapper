@@ -1,4 +1,5 @@
-var N = null;var sourcesIndex = {};
-sourcesIndex["bytemuck"] = {"name":"","files":["contiguous.rs","lib.rs","offset_of.rs","pod.rs","transparent.rs","zeroable.rs"]};
-sourcesIndex["livesplit_wrapper"] = {"name":"","files":["lib.rs"]};
+var sourcesIndex = JSON.parse('{\
+"bytemuck":["",[],["anybitpattern.rs","checked.rs","contiguous.rs","internal.rs","lib.rs","no_uninit.rs","offset_of.rs","pod.rs","pod_in_option.rs","transparent.rs","zeroable.rs","zeroable_in_option.rs"]],\
+"livesplit_wrapper":["",[],["lib.rs"]]\
+}');
 createSourceSidebar();
