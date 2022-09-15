@@ -47,7 +47,7 @@ impl Splitter for MySplitter {
         let mut s = MySplitter::default();
         s.process = s.attach("CoolGame.exe");
         if s.process.is_none() {
-            s.print("failed to connect to process, is the game running?");
+            log::info!("failed to connect to process, is the game running?");
         }
         s.set_tick_rate(120.0);
         s.set_variable("items collected", "0");

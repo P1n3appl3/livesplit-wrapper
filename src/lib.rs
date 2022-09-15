@@ -2,10 +2,35 @@
 #![doc = include_str!("../README.md")]
 #![doc(html_logo_url = "https://github.com/LiveSplit.png")]
 
-use std::mem::{self, MaybeUninit};
-use std::slice;
+mod process;
+pub use process::{Address, Error, Pod, Process, Result};
 
-pub use bytemuck::Pod;
+use log::{Level, Metadata, Record};
+
+/// This logger gets initialized automatically when you register an autosplitter
+/// and emits logs to LiveSplit's autosplitter runtime.
+pub struct Logger;
+
+impl log::Log for Logger {
+    fn enabled(&self, metadata: &Metadata) -> bool {
+        metadata.level() <= Level::Info
+    }
+
+    fn log(&self, record: &Record) {
+        if self.enabled(record.metadata()) {
+            // TODO: fixed size formatter to avoid alloc?
+            let s = match record.level() {
+                Level::Info => format!("{}", record.args()),
+                Level::Warn => format!("⚠️ {}", record.args()),
+                Level::Error => format!("⛔ {}", record.args()),
+                _ => "".to_owned(),
+            };
+            unsafe { ffi::runtime_print_message(s.as_ptr(), s.len()) }
+        }
+    }
+
+    fn flush(&self) {}
+}
 
 /// Wires up the necessary c interface for a type that implements [`Splitter`].
 ///
@@ -15,109 +40,43 @@ pub use bytemuck::Pod;
 #[macro_export]
 macro_rules! register_autosplitter {
     ($struct:ident) => {
-        use std::cell::{Cell, RefCell};
+        use std::{
+            cell::{Cell, RefCell},
+            panic,
+        };
+
+        use livesplit_wrapper::Logger;
+
+        const LOGGER: Logger = Logger;
         thread_local! {
             static SINGLETON: RefCell<$struct> = RefCell::default();
             static INITIALIZED: Cell<bool> = Cell::new(false);
         }
+
         #[no_mangle]
         pub extern "C" fn update() {
-            if INITIALIZED.with(|id| id.get()) {
+            if INITIALIZED.with(|init| init.get()) {
                 SINGLETON.with(|s| s.borrow_mut().update());
             } else {
+                log::set_logger(&LOGGER)
+                    .map(|()| log::set_max_level(log::LevelFilter::Info))
+                    .ok();
+                panic::set_hook(Box::new(|panic_info| {
+                    if let Some(location) = panic_info.location() {
+                        log::error!(
+                            "panic occurred in file '{}' at line {}",
+                            location.file(),
+                            location.line(),
+                        );
+                    } else {
+                        log::error!("panic occurred but can't get location information...");
+                    }
+                }));
                 SINGLETON.with(|s| s.replace($struct::new()));
+                INITIALIZED.with(|init| init.set(true));
             }
         }
     };
-}
-
-/// Currently the only possible error is a failed memory read on the attached
-/// process.
-#[derive(Debug)]
-pub enum Error {
-    /// A memory read on the attached process failed
-    FailedRead,
-}
-
-/// The result of an attempt to read process memory.
-pub type Result<T> = std::result::Result<T, Error>;
-
-/// An address in the attached processes memory.
-///
-/// Autosplitters can attach to 32-bit processes, they'll just get an error if
-/// they try to read outside it's address space.
-pub type Address = u64;
-
-/// A handle representing an attached process that can be used to read its
-/// memory.
-#[derive(Debug)]
-pub struct Process(u64);
-
-impl Process {
-    /// Reads a single value from the attached processes memory space. To be
-    /// able to use this with your own types, they need to implement [`Pod`]
-    /// (it's implemented for the numeric types and fixed size arrays by
-    /// default).
-    pub fn read<T: Pod>(&self, addr: Address) -> Result<T> {
-        unsafe {
-            let mut buf = MaybeUninit::uninit();
-            self.read_into_buf(
-                addr,
-                slice::from_raw_parts_mut(buf.as_mut_ptr() as *mut u8, mem::size_of::<T>()),
-            )?;
-            Ok(buf.assume_init())
-        }
-    }
-
-    /// Search for a module (aka dynamic library) loaded by the attached process
-    /// by name and return its base address.
-    pub fn module(&self, name: &str) -> Option<Address> {
-        unsafe {
-            match ffi::process_get_module_address(self.0, name.as_ptr() as u32, name.len() as u32) {
-                0 => None,
-                n => Some(n),
-            }
-        }
-    }
-
-    /// Read bytes from the attached processes memory space starting at `addr`
-    /// into `buf`.
-    pub fn read_into_buf(&self, addr: Address, buf: &mut [u8]) -> Result<()> {
-        unsafe {
-            (ffi::process_read(self.0, addr, buf.as_mut_ptr() as u32, buf.len() as u32) != 0)
-                .then_some(())
-                .ok_or(Error::FailedRead)
-        }
-    }
-
-    /// Reads a null terminated string starting at the given base address.
-    /// Returns an `Error` if no null is encountered after 255 bytes or the
-    /// bytes read are invalid unicode.
-    pub fn read_cstr(&self, base: u64) -> Result<String> {
-        const MAX_STR_LEN: usize = 256;
-        let mut buf = vec![0u8; MAX_STR_LEN];
-        unsafe {
-            (ffi::process_read(
-                self.0,
-                base,
-                buf.as_mut_ptr() as u32,
-                MAX_STR_LEN as u32 - 1,
-            ) != 0)
-                .then_some(())
-                .ok_or(Error::FailedRead)?;
-        }
-        buf.truncate(buf.iter().position(|&x| x == 0).expect("string too long") + 1);
-        let cstr = std::ffi::CString::from_vec_with_nul(buf).expect("invalid unicode");
-        Ok(cstr.to_string_lossy().to_string())
-    }
-}
-
-impl Drop for Process {
-    fn drop(&mut self) {
-        unsafe {
-            ffi::process_detach(self.0);
-        }
-    }
 }
 
 /// The main autosplitter trait.
@@ -151,16 +110,6 @@ pub trait Splitter {
 
 /// The autosplitter's interface for interacting with the LiveSpilit timer.
 pub trait HostFunctions {
-    /// Output a message. This can be used for debugging and/or sending error
-    /// messages to the player through whichever LiveSplit frontend they're
-    /// using. Note that because autosplitters run in WASM, they don't have
-    /// access to STDOUT or files, so typical solutions like `println!` and
-    /// logging will not work (this could chagne in the future as LiveSplit
-    /// plans to support WASI).
-    fn print(&self, str: &str) {
-        unsafe { ffi::runtime_print_message(str.as_ptr(), str.len()) }
-    }
-
     /// Attach to a process running on the same machine as the autosplitter.
     fn attach(&self, name: &str) -> Option<Process> {
         unsafe {
