@@ -223,11 +223,34 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
 </pre><pre class="rust"><code><span class="attribute">#![deny(missing_docs)]
 #![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]
 #![doc(html_logo_url = <span class="string">&quot;https://github.com/LiveSplit.png&quot;</span>)]
 
 </span><span class="kw">mod </span>process;
+<span class="kw">use </span>std::time::Duration;
+
+<span class="kw">pub use </span>once_cell::sync::OnceCell;
 <span class="kw">pub use </span>process::{Address, Error, Pod, Process, <span class="prelude-ty">Result</span>};
 
 <span class="kw">use </span>log::{Level, Metadata, Record};
@@ -248,7 +271,7 @@
                 Level::Info =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, record.args()),
                 Level::Warn =&gt; <span class="macro">format!</span>(<span class="string">&quot;⚠️ {}&quot;</span>, record.args()),
                 Level::Error =&gt; <span class="macro">format!</span>(<span class="string">&quot;⛔ {}&quot;</span>, record.args()),
-                <span class="kw">_ </span>=&gt; <span class="string">&quot;&quot;</span>.to_owned(),
+                <span class="kw">_ </span>=&gt; <span class="macro">unimplemented!</span>(),
             };
             <span class="kw">unsafe </span>{ ffi::runtime_print_message(s.as_ptr(), s.len()) }
         }
@@ -265,41 +288,38 @@
 </span><span class="attribute">#[macro_export]
 </span><span class="macro">macro_rules! </span>register_autosplitter {
     (<span class="macro-nonterminal">$</span><span class="kw">struct</span>:<span class="macro-nonterminal">ident</span>) =&gt; {
-        <span class="kw">use </span>std::{
-            cell::{Cell, RefCell},
-            panic,
-        };
+        <span class="kw">use </span>std::panic;
+        <span class="comment">// TODO: make sure mutex is a nop in wasm
+        </span><span class="kw">use </span>std::sync::Mutex;
 
-        <span class="kw">use </span>livesplit_wrapper::Logger;
+        <span class="kw">use </span><span class="macro-nonterminal">$</span><span class="kw">crate</span>::{<span class="macro-nonterminal">Logger</span>, OnceCell};
 
         <span class="kw">const </span>LOGGER: Logger = Logger;
-        <span class="macro">thread_local! </span>{
-            <span class="kw">static </span>SINGLETON: RefCell&lt;<span class="macro-nonterminal">$</span><span class="kw">struct</span>&gt; = <span class="macro-nonterminal">RefCell::default</span>();
-            <span class="kw">static </span>INITIALIZED: Cell&lt;bool&gt; = Cell::new(<span class="bool-val">false</span>);
-        }
+        <span class="kw">static </span>SINGLETON: OnceCell&lt;Mutex&lt;<span class="macro-nonterminal">$</span><span class="kw">struct</span>&gt;&gt; = <span class="macro-nonterminal">OnceCell::new</span>();
 
         <span class="attribute">#[no_mangle]
         </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>update() {
-            <span class="kw">if </span>INITIALIZED.with(|init| init.get()) {
-                SINGLETON.with(|s| s.borrow_mut().update());
-            } <span class="kw">else </span>{
-                log::set_logger(<span class="kw-2">&amp;</span>LOGGER)
-                    .map(|()| log::set_max_level(log::LevelFilter::Info))
-                    .ok();
-                panic::set_hook(Box::new(|panic_info| {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(location) = panic_info.location() {
-                        <span class="macro">log::error!</span>(
-                            <span class="string">&quot;panic occurred in file &#39;{}&#39; at line {}&quot;</span>,
-                            location.file(),
-                            location.line(),
-                        );
-                    } <span class="kw">else </span>{
-                        <span class="macro">log::error!</span>(<span class="string">&quot;panic occurred but can&#39;t get location information...&quot;</span>);
-                    }
-                }));
-                SINGLETON.with(|s| s.replace(<span class="macro-nonterminal">$</span><span class="kw">struct</span><span class="macro-nonterminal">::new</span>()));
-                INITIALIZED.with(|init| init.set(<span class="bool-val">true</span>));
-            }
+            SINGLETON
+                .get_or_init(|| {
+                    log::set_logger(<span class="kw-2">&amp;</span>LOGGER)
+                        .map(|()| log::set_max_level(log::LevelFilter::Info))
+                        .ok();
+                    panic::set_hook(Box::new(|panic_info| {
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(location) = panic_info.location() {
+                            <span class="macro">log::error!</span>(
+                                <span class="string">&quot;panic occurred in file &#39;{}&#39; at line {}&quot;</span>,
+                                location.file(),
+                                location.line(),
+                            );
+                        } <span class="kw">else </span>{
+                            <span class="macro">log::error!</span>(<span class="string">&quot;panic occurred but can&#39;t get location information...&quot;</span>);
+                        }
+                    }));
+                    Mutex::new(<span class="macro-nonterminal">$</span><span class="kw">struct</span><span class="macro-nonterminal">::new</span>())
+                })
+                .lock()
+                .unwrap()
+                .update();
         }
     };
 }
@@ -353,7 +373,7 @@
     }
 
     <span class="doccomment">/// Pause the game time counter. This is often used when entering a loading
-    /// screen or end level screen for games that use in game time rather
+    /// screen or end level screen for games that use in-game time rather
     /// than real time. It may be a good idea to call `set_game_time()`
     /// immediately after pausing so that LiveSplit&#39;s game time counter
     /// shows the exact current time.
@@ -361,7 +381,7 @@
         <span class="kw">unsafe </span>{ ffi::timer_pause_game_time() }
     }
 
-    <span class="doccomment">/// Resume the game time counter. Note that
+    <span class="doccomment">/// Resume the game time counter.
     </span><span class="kw">fn </span>unpause(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="kw">unsafe </span>{ ffi::timer_resume_game_time() }
     }
@@ -382,8 +402,8 @@
     <span class="doccomment">/// Set the game time. Note that if the timer is not paused, the time shown
     /// will keep incrementing immediately after it is set to the given
     /// value.
-    </span><span class="kw">fn </span>set_game_time(<span class="kw-2">&amp;</span><span class="self">self</span>, time: f64) {
-        <span class="kw">unsafe </span>{ ffi::timer_set_game_time(time) }
+    </span><span class="kw">fn </span>set_game_time(<span class="kw-2">&amp;</span><span class="self">self</span>, time: Duration) {
+        <span class="kw">unsafe </span>{ ffi::timer_set_game_time(time.as_secs() <span class="kw">as </span>i64, time.subsec_nanos() <span class="kw">as </span>i32) }
     }
 
     <span class="doccomment">/// Set the rate at which the [`update`](Splitter::update) function will be
@@ -440,11 +460,31 @@
         <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>timer_split();
         <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>timer_reset();
         <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>timer_set_variable(key: u32, key_len: u32, value: u32, value_len: u32);
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>timer_set_game_time(time: f64);
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>timer_set_game_time(seconds: i64, nanos: i32);
         <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>timer_pause_game_time();
         <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>timer_resume_game_time();
         <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>timer_get_state() -&gt; u32;
     }
 }
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+    <span class="attribute">#[derive(Debug, Default, Clone, Copy)]
+    </span><span class="kw">struct </span>Unit;
+
+    <span class="kw">impl </span>Splitter <span class="kw">for </span>Unit {
+        <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+            <span class="macro">todo!</span>()
+        }
+
+        <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+            <span class="macro">todo!</span>()
+        }
+    }
+
+    <span class="macro">register_autosplitter!</span>(Unit);
+}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="livesplit_wrapper" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0-nightly (750bd1a7f 2022-09-14)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="livesplit_wrapper" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-nightly (4a1467723 2022-09-23)" ></div></body></html>

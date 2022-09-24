@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["bytemuck","cfg_if","livesplit_wrapper","log"];
+window.ALL_CRATES = ["bytemuck","cfg_if","livesplit_wrapper","log","once_cell"];
