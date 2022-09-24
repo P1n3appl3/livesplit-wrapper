@@ -28,10 +28,10 @@ trait and invoke the
 [`register_autosplitter!`](https://p1n3appl3.github.io/livesplit-wrapper/livesplit_wrapper/macro.register_autosplitter.html)
 macro on your splitter.
 
-Here's a full working (albeit nonsensical) example. Build this with
+Here's a full (nonsensical) example. Build this with
 `--target wasm32-unknown-unknown` and it can be loaded by frontends such as
 [`livesplit-one-desktop`](https://github.com/CryZe/livesplit-one-desktop) or
-[`obs-livesplit-one`](https://github.com/CryZe/obs-livesplit-one):
+[`obs-livesplit`](https://github.com/P1n3appl3/obs-livesplit):
 
 ```rust
 use livesplit_wrapper::{Splitter, Process, TimerState, HostFunctions};
@@ -47,7 +47,7 @@ impl Splitter for MySplitter {
         let mut s = MySplitter::default();
         s.process = s.attach("CoolGame.exe");
         if s.process.is_none() {
-            log::info!("failed to connect to process, is the game running?");
+            log::warn!("failed to connect to process, is the game running?");
         }
         s.set_tick_rate(120.0);
         s.set_variable("items collected", "0");
@@ -65,3 +65,6 @@ impl Splitter for MySplitter {
     }
 }
 ```
+
+For a real-world example, check out
+[this Celeste autosplitter](https://github.com/P1n3appl3/climb/tree/main/auto-splitter).

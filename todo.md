@@ -1,6 +1,6 @@
-- add link to readme once livesplit-core provides a local debug runtime
-- add link to readme with an example autosplitter
-- add link to readme with a cargo-generate template
-- pointer chasing helper
-- edge triggering address watcher
-- wasi _start for configure
+-   add link to readme once livesplit-core provides a local debug runtime
+-   add link to readme with an example autosplitter
+-   add link to readme with a cargo-generate template
+-   pointer chasing helper
+-   memory scanning api?
+-   edge triggering address watcher

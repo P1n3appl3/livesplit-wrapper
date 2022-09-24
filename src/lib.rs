@@ -3,6 +3,9 @@
 #![doc(html_logo_url = "https://github.com/LiveSplit.png")]
 
 mod process;
+use std::time::Duration;
+
+pub use once_cell::sync::OnceCell;
 pub use process::{Address, Error, Pod, Process, Result};
 
 use log::{Level, Metadata, Record};
@@ -23,7 +26,7 @@ impl log::Log for Logger {
                 Level::Info => format!("{}", record.args()),
                 Level::Warn => format!("⚠️ {}", record.args()),
                 Level::Error => format!("⛔ {}", record.args()),
-                _ => "".to_owned(),
+                _ => unimplemented!(),
             };
             unsafe { ffi::runtime_print_message(s.as_ptr(), s.len()) }
         }
@@ -40,41 +43,38 @@ impl log::Log for Logger {
 #[macro_export]
 macro_rules! register_autosplitter {
     ($struct:ident) => {
-        use std::{
-            cell::{Cell, RefCell},
-            panic,
-        };
+        use std::panic;
+        // TODO: make sure mutex is a nop in wasm
+        use std::sync::Mutex;
 
-        use livesplit_wrapper::Logger;
+        use $crate::{Logger, OnceCell};
 
         const LOGGER: Logger = Logger;
-        thread_local! {
-            static SINGLETON: RefCell<$struct> = RefCell::default();
-            static INITIALIZED: Cell<bool> = Cell::new(false);
-        }
+        static SINGLETON: OnceCell<Mutex<$struct>> = OnceCell::new();
 
         #[no_mangle]
         pub extern "C" fn update() {
-            if INITIALIZED.with(|init| init.get()) {
-                SINGLETON.with(|s| s.borrow_mut().update());
-            } else {
-                log::set_logger(&LOGGER)
-                    .map(|()| log::set_max_level(log::LevelFilter::Info))
-                    .ok();
-                panic::set_hook(Box::new(|panic_info| {
-                    if let Some(location) = panic_info.location() {
-                        log::error!(
-                            "panic occurred in file '{}' at line {}",
-                            location.file(),
-                            location.line(),
-                        );
-                    } else {
-                        log::error!("panic occurred but can't get location information...");
-                    }
-                }));
-                SINGLETON.with(|s| s.replace($struct::new()));
-                INITIALIZED.with(|init| init.set(true));
-            }
+            SINGLETON
+                .get_or_init(|| {
+                    log::set_logger(&LOGGER)
+                        .map(|()| log::set_max_level(log::LevelFilter::Info))
+                        .ok();
+                    panic::set_hook(Box::new(|panic_info| {
+                        if let Some(location) = panic_info.location() {
+                            log::error!(
+                                "panic occurred in file '{}' at line {}",
+                                location.file(),
+                                location.line(),
+                            );
+                        } else {
+                            log::error!("panic occurred but can't get location information...");
+                        }
+                    }));
+                    Mutex::new($struct::new())
+                })
+                .lock()
+                .unwrap()
+                .update();
         }
     };
 }
@@ -128,7 +128,7 @@ pub trait HostFunctions {
     }
 
     /// Pause the game time counter. This is often used when entering a loading
-    /// screen or end level screen for games that use in game time rather
+    /// screen or end level screen for games that use in-game time rather
     /// than real time. It may be a good idea to call `set_game_time()`
     /// immediately after pausing so that LiveSplit's game time counter
     /// shows the exact current time.
@@ -136,7 +136,7 @@ pub trait HostFunctions {
         unsafe { ffi::timer_pause_game_time() }
     }
 
-    /// Resume the game time counter. Note that
+    /// Resume the game time counter.
     fn unpause(&self) {
         unsafe { ffi::timer_resume_game_time() }
     }
@@ -157,8 +157,8 @@ pub trait HostFunctions {
     /// Set the game time. Note that if the timer is not paused, the time shown
     /// will keep incrementing immediately after it is set to the given
     /// value.
-    fn set_game_time(&self, time: f64) {
-        unsafe { ffi::timer_set_game_time(time) }
+    fn set_game_time(&self, time: Duration) {
+        unsafe { ffi::timer_set_game_time(time.as_secs() as i64, time.subsec_nanos() as i32) }
     }
 
     /// Set the rate at which the [`update`](Splitter::update) function will be
@@ -215,9 +215,29 @@ mod ffi {
         pub(crate) fn timer_split();
         pub(crate) fn timer_reset();
         pub(crate) fn timer_set_variable(key: u32, key_len: u32, value: u32, value_len: u32);
-        pub(crate) fn timer_set_game_time(time: f64);
+        pub(crate) fn timer_set_game_time(seconds: i64, nanos: i32);
         pub(crate) fn timer_pause_game_time();
         pub(crate) fn timer_resume_game_time();
         pub(crate) fn timer_get_state() -> u32;
     }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[derive(Debug, Default, Clone, Copy)]
+    struct Unit;
+
+    impl Splitter for Unit {
+        fn new() -> Self {
+            todo!()
+        }
+
+        fn update(&mut self) {
+            todo!()
+        }
+    }
+
+    register_autosplitter!(Unit);
 }
